@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="900" viewBox="0 0 1420 900" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1420" height="900" fill="#ffffff"/>
+  <text x="40" y="44" font-size="18" font-weight="700" fill="#111827">화면 흐름도</text>
+  <text x="40" y="66" font-size="12.5" fill="#6b7280">액터별 진입점과 화면 전이. 점선 상자는 모달·오류 상태이며 별도 화면이 아니다.</text>
+
+  <rect x="34" y="92" width="1352" height="300" rx="12" fill="#eef2ff" opacity="0.5"/>
+  <text x="50" y="118" font-size="13.5" font-weight="700" fill="#2f5bea">건물 사용자 USER</text>
+  <text x="50" y="136" font-size="11.5" fill="#6b7280">비인증 · 민원 번호로 조회</text>
+
+  <rect x="34" y="372" width="1352" height="300" rx="12" fill="#fffbeb" opacity="0.5"/>
+  <text x="50" y="398" font-size="13.5" font-weight="700" fill="#b45309">시설물 작업자 WORKER</text>
+  <text x="50" y="416" font-size="11.5" fill="#6b7280">로그인 후 선점 · 처리</text>
+
+  <rect x="34" y="652" width="1352" height="300" rx="12" fill="#f0fdf4" opacity="0.5"/>
+  <text x="50" y="678" font-size="13.5" font-weight="700" fill="#16a34a">시설물 관리 소장 ADMIN</text>
+  <text x="50" y="696" font-size="11.5" fill="#6b7280">로그인 후 전체 관리</text>
+
+  <rect x="60" y="160" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="139.0" y="190.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-01 사용자 홈</text>
+
+  <rect x="268" y="110" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="347.0" y="140.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-02 민원 등록</text>
+
+  <rect x="476" y="110" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="555.0" y="140.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-03 접수 완료</text>
+
+  <rect x="268" y="218" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="347.0" y="248.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-04 민원 조회</text>
+
+  <rect x="684" y="160" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="763.0" y="190.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-05 민원 상세</text>
+
+  <rect x="892" y="110" width="158" height="50" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="971.0" y="140.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-06 본인 확인</text>
+
+  <rect x="1100" y="110" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="1179.0" y="140.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">U-07 민원 수정</text>
+
+  <rect x="892" y="218" width="158" height="50" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="971.0" y="248.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">E-03 취소 확인</text>
+
+  <rect x="60" y="440" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="139.0" y="470.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">W-01 직원 로그인</text>
+
+  <rect x="268" y="440" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="347.0" y="470.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">W-02 미배정 민원</text>
+
+  <rect x="476" y="440" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="555.0" y="470.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">W-03 민원 상세</text>
+
+  <rect x="684" y="390" width="158" height="50" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="763.0" y="420.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">W-04 담당 외 경고</text>
+
+  <rect x="684" y="498" width="158" height="50" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="763.0" y="528.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">E-01 선점 충돌</text>
+
+  <rect x="892" y="440" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="971.0" y="470.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">W-05 내 작업</text>
+
+  <rect x="1100" y="440" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="1179.0" y="470.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">W-06 결과 등록</text>
+
+  <rect x="1100" y="520" width="158" height="50" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="1179.0" y="550.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">E-04 반납 확인</text>
+
+  <rect x="268" y="720" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="347.0" y="750.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">A-01 운영 대시보드</text>
+
+  <rect x="476" y="720" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="555.0" y="750.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">A-02 전체 민원</text>
+
+  <rect x="684" y="720" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="763.0" y="750.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">A-03 민원 상세</text>
+
+  <rect x="892" y="670" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="971.0" y="700.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">A-04 강제 배정</text>
+
+  <rect x="892" y="778" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="971.0" y="808.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">A-05 민원 반려</text>
+
+  <rect x="476" y="808" width="158" height="50" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="555.0" y="838.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">A-06 민원 통계</text>
+
+  <polyline points="218,185.0 243.0,185.0 243.0,135.0 268,135.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="243.0" y="127.0" text-anchor="middle" font-size="11" fill="#6b7280">신고</text>
+
+  <polyline points="426,135.0 476,135.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="451.0" y="127.0" text-anchor="middle" font-size="11" fill="#6b7280">접수</text>
+
+  <polyline points="634,135.0 659.0,135.0 659.0,185.0 684,185.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="659.0" y="127.0" text-anchor="middle" font-size="11" fill="#6b7280">상세 보기</text>
+
+  <polyline points="218,185.0 243.0,185.0 243.0,243.0 268,243.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="243.0" y="177.0" text-anchor="middle" font-size="11" fill="#6b7280">조회</text>
+
+  <polyline points="426,243.0 555.0,243.0 555.0,185.0 684,185.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="555.0" y="177.0" text-anchor="middle" font-size="11" fill="#6b7280">민원 번호</text>
+
+  <polyline points="842,185.0 867.0,185.0 867.0,135.0 892,135.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="867.0" y="127.0" text-anchor="middle" font-size="11" fill="#6b7280">수정·취소</text>
+
+  <polyline points="1050,135.0 1100,135.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="1075.0" y="127.0" text-anchor="middle" font-size="11" fill="#6b7280">확인 통과</text>
+
+  <polyline points="971.0,160 971.0,189.0 971.0,189.0 971.0,218" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="979.0" y="182.0" text-anchor="middle" font-size="11" fill="#6b7280">취소 선택</text>
+
+  <polyline points="1179.0,160 1179.0,204 864,204 864,185.0 842,185.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="1010.5" y="218" text-anchor="middle" font-size="11" fill="#6b7280">수정 완료</text>
+
+  <polyline points="218,465.0 268,465.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="243.0" y="457.0" text-anchor="middle" font-size="11" fill="#6b7280">로그인</text>
+
+  <polyline points="426,465.0 476,465.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="451.0" y="457.0" text-anchor="middle" font-size="11" fill="#6b7280">민원 선택</text>
+
+  <polyline points="634,465.0 659.0,465.0 659.0,415.0 684,415.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="659.0" y="407.0" text-anchor="middle" font-size="11" fill="#6b7280">담당 외</text>
+
+  <polyline points="634,465.0 659.0,465.0 659.0,523.0 684,523.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="659.0" y="457.0" text-anchor="middle" font-size="11" fill="#6b7280">409</text>
+
+  <polyline points="842,415.0 867.0,415.0 867.0,465.0 892,465.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="867.0" y="407.0" text-anchor="middle" font-size="11" fill="#6b7280">그래도 선점</text>
+
+  <polyline points="1050,465.0 1100,465.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="1075.0" y="457.0" text-anchor="middle" font-size="11" fill="#6b7280">결과 등록</text>
+
+  <polyline points="1179.0,490 1179.0,505.0 1179.0,505.0 1179.0,520" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="1187.0" y="498.0" text-anchor="middle" font-size="11" fill="#6b7280">반납</text>
+
+  <polyline points="426,745.0 476,745.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="451.0" y="737.0" text-anchor="middle" font-size="11" fill="#6b7280">전체 보기</text>
+
+  <polyline points="634,745.0 684,745.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="659.0" y="737.0" text-anchor="middle" font-size="11" fill="#6b7280">민원 선택</text>
+
+  <polyline points="842,745.0 867.0,745.0 867.0,695.0 892,695.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="867.0" y="687.0" text-anchor="middle" font-size="11" fill="#6b7280">배정</text>
+
+  <polyline points="842,745.0 867.0,745.0 867.0,803.0 892,803.0" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="867.0" y="737.0" text-anchor="middle" font-size="11" fill="#6b7280">반려</text>
+
+  <polyline points="347.0,770 347.0,789.0 555.0,789.0 555.0,808" fill="none" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="459.0" y="782.0" text-anchor="middle" font-size="11" fill="#6b7280">통계</text>
+
+  <polyline points="139.0,490 139.0,745.0 268,745.0" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#a)"/>
+  <text x="147.0" y="737.0" font-size="11" fill="#6b7280">ADMIN 으로 로그인</text>
+
+  <text x="50" y="628" font-size="11" fill="#6b7280">담당 카테고리 민원은 W-04 경고 없이 W-03 에서 바로 선점한다.</text>
+
+  <rect x="1060" y="690" width="326" height="150" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="1078" y="714" font-size="12.5" font-weight="700" fill="#111827">진입점</text>
+  <text x="1078" y="736" font-size="11.5" fill="#6b7280">USER  로그인 없이 U-01 에서 시작한다.</text>
+  <text x="1078" y="756" font-size="11.5" fill="#6b7280">WORKER · ADMIN  W-01 직원 로그인을 공유하며,</text>
+  <text x="1078" y="774" font-size="11.5" fill="#6b7280">인증 후 역할에 따라 W-02 또는 A-01 로 갈린다.</text>
+  <text x="1078" y="800" font-size="11.5" fill="#6b7280">U-05 는 신고자·작업자·관리소장이 각각</text>
+  <text x="1078" y="818" font-size="11.5" fill="#6b7280">다른 액션 영역을 보는 공통 레이아웃이다.</text>
+</svg>

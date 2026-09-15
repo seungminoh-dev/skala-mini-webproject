@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8">
+<style>body{margin:0;background:#fff;font-family:sans-serif}
+#grid{display:flex;flex-wrap:wrap;gap:5px;padding:6px}
+.pg{position:relative}.pg .n{position:absolute;left:2px;top:2px;background:#111;color:#fff;font-size:11px;padding:1px 6px;border-radius:3px;font-weight:700}
+canvas{border:1px solid #ccc;display:block}</style>
+<div id="grid"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+window.__ready=false;
+(async()=>{ window.__doc=await pdfjsLib.getDocument('/docs/ref/deck.pdf').promise; window.__n=window.__doc.numPages; window.__ready=true; })();
+window.render=async(from,to,scale)=>{const g=document.getElementById('grid');g.innerHTML='';
+ for(let i=from;i<=to;i++){const p=await window.__doc.getPage(i);const vp=p.getViewport({scale});
+  const w=document.createElement('div');w.className='pg';const c=document.createElement('canvas');
+  c.width=vp.width;c.height=vp.height;const t=document.createElement('div');t.className='n';t.textContent=i;
+  w.appendChild(c);w.appendChild(t);g.appendChild(w);
+  await p.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;}
+ return 'ok '+from+'-'+to;};
+</script>

@@ -1,0 +1,1101 @@
+openapi: 3.0.3
+
+info:
+  title: 오피스 시설 민원 처리 서비스 API
+  version: 1.0.0
+  description: |
+    오피스 빌딩 시설물 민원의 접수부터 처리 완료까지를 다루는 API.
+
+    ## 설계 규칙
+
+    1. **상태를 바꾸는 행위는 하위 리소스에 대한 조작으로 표현한다.**
+       `POST /complaints/{id}/claim`, `DELETE /complaints/{id}/assignment` 처럼
+       전이의 의미를 경로와 메서드로 드러낸다. 본체에 대한 `PATCH` 는
+       상태를 바꾸지 않는 내용 수정에만 사용한다.
+
+    2. **같은 리소스에 대한 수정 경로를 권한별로 분리한다.**
+       신고자의 원문 수정은 `PATCH /complaints/{id}`,
+       관리소장의 분류 정보 수정은 `PATCH /complaints/{id}/classification` 이다.
+       수정 가능 필드와 허용 상태가 서로 다르므로 하나의 엔드포인트에서
+       역할로 분기하지 않고 경로를 나눈다.
+
+    3. **신고자의 본인 확인 수단은 인증이 아니라 요청 파라미터다.**
+       건물 사용자는 로그인하지 않으므로, 수정·취소 요청에는 접수 시 입력한
+       4자리 비밀번호를 요청 본문에 담는다. 조회는 공개이므로 비밀번호가 없다.
+       `DELETE` 에 본문을 싣는 것을 피하기 위해 취소는 `POST .../cancel` 로 둔다.
+
+    4. **목록 조회는 직원 전용, 단건 조회는 공개다.**
+       민원 번호를 아는 신고자만 자신의 민원을 볼 수 있어야 하므로
+       `GET /complaints` 는 직원만, `GET /complaints/{id}` 는 누구나 호출할 수 있다.
+
+    ## 범위 밖
+
+    과제 범위에 따라 Security Schemes 는 기술하지 않는다.
+    직원 전용 엔드포인트는 역할 기반 인가가 적용된다고 가정하며,
+    인가 실패 시의 응답(401/403)만 정의한다.
+
+servers:
+  - url: https://api.office-fm.example.com/v1
+    description: 운영
+  - url: http://localhost:8080/v1
+    description: 로컬
+
+tags:
+  - name: Complaint (Public)
+    description: 건물 사용자(USER) — 비인증
+  - name: Auth
+    description: 직원 인증
+  - name: Complaint (Staff)
+    description: 직원 공통 — 목록 조회 및 상세
+  - name: Worker
+    description: 시설물 작업자(WORKER)
+  - name: Admin
+    description: 시설물 관리 소장(ADMIN)
+  - name: Meta
+    description: 기준 데이터
+
+paths:
+  # ── 건물 사용자 (비인증) ──────────────────────────────────
+  /complaints:
+    post:
+      tags: [Complaint (Public)]
+      summary: 민원 등록
+      description: |
+        FR-101. 위치·카테고리·내용과 수정·취소용 4자리 비밀번호를 받아 민원을 접수한다.
+        접수 후 발급되는 민원 번호는 순차 증가값이 아닌 비순차 식별자다.
+      operationId: createComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintCreateRequest'
+      responses:
+        '201':
+          description: 접수됨
+          headers:
+            Location:
+              description: 생성된 민원의 URI
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      tags: [Complaint (Staff)]
+      summary: 민원 목록 조회
+      description: |
+        FR-201(미배정 목록), FR-204(내 작업), FR-301(전체 현황), FR-302(지연 민원)를
+        하나의 엔드포인트로 처리한다. 화면별로 질의 조건만 달라진다.
+
+        | 화면 | 질의 |
+        |---|---|
+        | 미배정 민원 (W-02) | `status=RECEIVED` |
+        | 내 작업 (W-05) | `assignee=me&status=IN_PROGRESS` |
+        | 전체 민원 (A-02) | 조건 없음 또는 필터 조합 |
+        | 지연 민원 (A-01) | `status=RECEIVED&delayed=true` |
+
+        **직원 전용이다.** 신고자는 민원 번호로 단건 조회만 할 수 있다.
+      operationId: listComplaints
+      parameters:
+        - name: status
+          in: query
+          description: 상태 필터
+          schema:
+            $ref: '#/components/schemas/ComplaintStatus'
+        - name: categoryCode
+          in: query
+          schema:
+            $ref: '#/components/schemas/CategoryCode'
+        - name: floorNo
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 8 }
+        - name: priority
+          in: query
+          schema:
+            $ref: '#/components/schemas/ComplaintPriority'
+        - name: assignee
+          in: query
+          description: 담당자 사번. `me` 를 넘기면 호출한 작업자 본인을 뜻한다.
+          schema: { type: string, example: me }
+        - name: delayed
+          in: query
+          description: 선점 대기 시간이 우선순위별 임계값(긴급 1시간 / 보통 6시간 / 낮음 24시간)을 초과한 건만 조회
+          schema: { type: boolean }
+        - name: keyword
+          in: query
+          description: 제목 또는 민원 번호 부분 일치
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 0, default: 0 }
+        - name: size
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /complaints/{complaintId}:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+
+    get:
+      tags: [Complaint (Public)]
+      summary: 민원 단건 조회 (공개)
+      description: |
+        FR-102. 민원 번호만으로 상태·담당자·처리 이력·조치 결과를 확인한다.
+        비밀번호를 요구하지 않는다. 조회 단계에서 본인 확인을 요구하면
+        "내 신고가 어떻게 처리되고 있는지" 확인하려는 사용자에게 장벽이 되기 때문이다.
+      operationId: getComplaint
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Complaint (Public)]
+      summary: 민원 원문 수정 (신고자)
+      description: |
+        FR-103. 신고자가 자신이 등록한 내용을 수정한다.
+        본인 확인을 위해 접수 시 입력한 비밀번호를 본문에 포함한다.
+        배정 전(`RECEIVED`)에만 허용된다.
+      operationId: updateComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintUpdateRequest'
+      responses:
+        '200':
+          description: 수정됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /complaints/{complaintId}/password-verification:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Complaint (Public)]
+      summary: 본인 확인
+      description: |
+        수정·취소 화면에 진입하기 전에 비밀번호가 맞는지, 그리고 지금 수정·취소가
+        가능한 상태인지 미리 확인한다. 사용자가 폼을 다 채운 뒤에야 실패를 알게 되는
+        것을 막기 위한 선행 검증이며, 토큰을 발급하지 않는다.
+      operationId: verifyComplaintPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRequest'
+      responses:
+        '200':
+          description: 확인됨
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified: { type: boolean, example: true }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /complaints/{complaintId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Complaint (Public)]
+      summary: 민원 취소 (신고자)
+      description: |
+        FR-104. 상태를 `CANCELED` 로 전환한다. 배정 전에만 가능하다.
+
+        물리 삭제가 아닌 이유는 접수 건수 통계에서 누락되지 않아야 하기 때문이며,
+        `DELETE` 대신 `POST` 를 쓰는 이유는 본인 확인용 비밀번호를 본문에 담아야 하는데
+        `DELETE` 요청의 본문은 중간 프록시에서 보장되지 않기 때문이다.
+      operationId: cancelComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRequest'
+      responses:
+        '200':
+          description: 취소됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  # ── 인증 ────────────────────────────────────────────────
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 직원 로그인
+      description: FR-001. 사번과 비밀번호로 인증하고 역할을 반환한다. 반환된 역할에 따라 진입 화면이 갈린다.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ── 작업자 ──────────────────────────────────────────────
+  /complaints/{complaintId}/related:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    get:
+      tags: [Worker]
+      summary: 동일 위치·카테고리의 진행 중 민원 조회
+      description: |
+        FR-206. 같은 층·공간·카테고리에서 아직 종료되지 않은(`RECEIVED`, `IN_PROGRESS`)
+        다른 민원을 반환한다. 작업자가 현장에 나가기 전에 중복 여부를 판단하는 근거이며,
+        중복으로 확인되면 관리소장이 원본과 연결해 반려한다. (AS-04)
+
+        자동 탐지가 아니라 **판단 재료를 보여주는 것**이다. 동일 건 여부는 사람이 정한다.
+      operationId: getRelatedComplaints
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComplaintSummary'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /complaints/{complaintId}/claim:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Worker]
+      summary: 민원 선점
+      description: |
+        FR-202. 미배정 민원을 호출한 작업자 본인에게 배정하고 `IN_PROGRESS` 로 전환한다.
+
+        **담당 카테고리가 아니어도 선점할 수 있다(P-01).** 신고자가 카테고리를 잘못
+        분류한 민원이 정정 전까지 방치되는 것을 막기 위함이며, 담당 외 여부는 UI에서
+        경고로 안내하고 이력의 `note` 에 기록된다.
+
+        두 작업자가 동시에 같은 민원을 선점하면 먼저 도달한 요청만 성공하고
+        나머지는 `409 ALREADY_CLAIMED` 로 거부된다.
+      operationId: claimComplaint
+      responses:
+        '200':
+          description: 선점됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 이미 다른 작업자가 선점함
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: ALREADY_CLAIMED
+                message: 이미 다른 작업자가 선점한 민원입니다.
+
+  /complaints/{complaintId}/release:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Worker]
+      summary: 민원 반납
+      description: |
+        FR-203. 담당 작업자가 처리할 수 없는 민원을 미배정 상태로 되돌린다.
+        상태는 `RECEIVED` 가 되고 다른 작업자가 다시 선점할 수 있다.
+      operationId: releaseComplaint
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  maxLength: 255
+                  description: 반납 사유. 선택 입력이며 처리 이력에 기록된다.
+      responses:
+        '200':
+          description: 반납됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 본인이 담당 중인 민원이 아님
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: NOT_ASSIGNEE
+                message: 본인이 담당 중인 민원이 아닙니다.
+
+  /complaints/{complaintId}/completion:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Worker]
+      summary: 처리 결과 등록
+      description: |
+        FR-205. 조치 내용·사진·소요 시간을 기록하고 `COMPLETED` 로 전환한다.
+        신고자의 확인 단계를 두지 않으므로 이 상태가 최종이다.
+      operationId: completeComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompletionRequest'
+      responses:
+        '200':
+          description: 처리 완료
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  # ── 관리소장 ────────────────────────────────────────────
+  /dashboard:
+    get:
+      tags: [Admin]
+      summary: 운영 현황 조회
+      description: |
+        FR-301·FR-302·FR-303. A-01 운영 대시보드 한 화면을 한 번의 호출로 채운다.
+        상태별 건수, 지연 민원, 작업자별 보유 현황을 함께 반환한다.
+      operationId: getDashboard
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /workers:
+    get:
+      tags: [Admin]
+      summary: 작업자 목록 및 보유 현황
+      description: |
+        FR-303. 강제 배정 대상을 고를 때 사용한다. 작업자별 담당 카테고리와
+        현재 보유 건수를 함께 반환하므로, 관리소장이 쏠림을 보고 판단할 수 있다. (AS-02)
+      operationId: listWorkers
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkerSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /complaints/{complaintId}/assignment:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Admin]
+      summary: 강제 배정 / 재배정
+      description: |
+        FR-304·FR-305. 관리소장이 특정 작업자를 지정해 배정한다.
+        `RECEIVED` 에서 호출하면 강제 배정, `IN_PROGRESS` 에서 호출하면 담당자 교체다.
+        선점과 달리 담당 카테고리 제약도, 보유 건수 상한도 적용하지 않는다.
+      operationId: assignComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentRequest'
+      responses:
+        '200':
+          description: 배정됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: 민원 또는 작업자를 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                complaint:
+                  value: { code: COMPLAINT_NOT_FOUND, message: 해당 민원 번호를 찾을 수 없습니다. }
+                worker:
+                  value: { code: WORKER_NOT_FOUND, message: 작업자를 찾을 수 없습니다. }
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+    delete:
+      tags: [Admin]
+      summary: 배정 회수
+      description: |
+        FR-306. 배정을 해제해 `RECEIVED` 로 되돌린다.
+        배정(assignment)을 민원의 하위 리소스로 보고 그 삭제로 표현한다.
+      operationId: revokeAssignment
+      responses:
+        '200':
+          description: 회수됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 배정된 민원이 아님
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: INVALID_STATE
+                message: 배정된 민원이 아닙니다.
+
+  /complaints/{complaintId}/classification:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    patch:
+      tags: [Admin]
+      summary: 분류 정보 수정
+      description: |
+        FR-307. 신고자가 잘못 입력한 위치·카테고리·우선순위를 정정한다. 상태와 무관하게 가능하다.
+
+        **신고 원문(제목·상세 내용·사진)은 이 엔드포인트로 수정할 수 없다.**
+        원문은 신고자의 진술 기록이므로 관리자가 변경하면 이력 기반이라는 전제가 무너진다.
+        원문 오류는 신고자가 직접 수정하거나(`PATCH /complaints/{id}`), 반려 후 재접수로 처리한다.
+      operationId: updateClassification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassificationUpdateRequest'
+      responses:
+        '200':
+          description: 수정됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /complaints/{complaintId}/rejection:
+    parameters:
+      - $ref: '#/components/parameters/ComplaintId'
+    post:
+      tags: [Admin]
+      summary: 민원 반려
+      description: |
+        FR-308. 관리 대상이 아니거나 중복인 민원을 `REJECTED` 로 전환한다.
+        `rejectionType` 이 `DUPLICATE` 면 `originalComplaintId` 가 필수다(D-01).
+        신고자는 반려된 민원 상세에서 원본 민원으로 이동해 진행 상황을 확인한다.
+      operationId: rejectComplaint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectionRequest'
+      responses:
+        '200':
+          description: 반려됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+        '400':
+          description: 사유 누락 또는 원본 민원 연결 오류
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                originalRequired:
+                  value: { code: ORIGINAL_REQUIRED, message: 중복 반려는 원본 민원을 연결해야 합니다. }
+                invalidOriginal:
+                  value: { code: INVALID_ORIGINAL, message: 자기 자신을 원본으로 연결할 수 없습니다. }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /statistics:
+    get:
+      tags: [Admin]
+      summary: 민원 통계 조회
+      description: |
+        FR-309. 기간별 발생 건수, 평균 처리 시간, 반려율과 카테고리·위치별 분포를 반환한다.
+        정기 정비 요청의 수치 근거로 사용한다. (AS-01)
+      operationId: getStatistics
+      parameters:
+        - name: from
+          in: query
+          description: 집계 시작일 (미지정 시 전체 기간)
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          description: 집계 종료일 (해당 일자 포함)
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ── 기준 데이터 ─────────────────────────────────────────
+  /categories:
+    get:
+      tags: [Meta]
+      summary: 설비 카테고리 목록
+      description: 민원 등록·수정 화면의 카테고리 선택지를 채운다. 비인증으로 호출할 수 있다.
+      operationId: listCategories
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+components:
+  parameters:
+    ComplaintId:
+      name: complaintId
+      in: path
+      required: true
+      description: 민원 번호
+      schema:
+        type: string
+        pattern: '^M-\d{6}-[A-Z2-9]{6}$'
+        example: M-260915-A7K2Q9
+
+  responses:
+    BadRequest:
+      description: 요청 값이 올바르지 않음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: INVALID_PAYLOAD
+            message: 필수 입력값이 비어 있습니다.
+    Unauthorized:
+      description: 인증 실패 또는 본인 확인 실패
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            passwordMismatch:
+              value: { code: PASSWORD_MISMATCH, message: 비밀번호가 일치하지 않습니다. }
+            loginFailed:
+              value: { code: LOGIN_FAILED, message: 사번 또는 비밀번호가 올바르지 않습니다. }
+    Forbidden:
+      description: 해당 역할에 허용되지 않은 요청
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: FORBIDDEN
+            message: 이 작업을 수행할 권한이 없습니다.
+    NotFound:
+      description: 대상을 찾을 수 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: COMPLAINT_NOT_FOUND
+            message: 해당 민원 번호를 찾을 수 없습니다.
+    Conflict:
+      description: 현재 상태에서 허용되지 않는 요청
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            notEditable:
+              value: { code: NOT_EDITABLE, message: 이미 배정되어 수정할 수 없습니다. }
+            notCancelable:
+              value: { code: NOT_CANCELABLE, message: 이미 배정되어 취소할 수 없습니다. }
+            invalidState:
+              value: { code: INVALID_STATE, message: 현재 상태에서 수행할 수 없는 요청입니다. }
+
+  schemas:
+    # ── 열거형 (ERD 와 동일) ──────────────────────────────
+    ComplaintStatus:
+      type: string
+      description: |
+        민원 상태.
+        `RECEIVED` 접수됨(미배정) · `IN_PROGRESS` 처리중 · `COMPLETED` 처리완료 ·
+        `REJECTED` 반려 · `CANCELED` 취소됨
+      enum: [RECEIVED, IN_PROGRESS, COMPLETED, REJECTED, CANCELED]
+
+    ComplaintPriority:
+      type: string
+      description: 체감 우선순위. 선점 대기 임계값은 긴급 1시간 / 보통 6시간 / 낮음 24시간.
+      enum: [URGENT, NORMAL, LOW]
+
+    CategoryCode:
+      type: string
+      description: 전기·조명 / 급배수·위생 / 공조 / 승강기 / 출입·보안 / 집기·비품
+      enum: [ELEC, WATER, HVAC, ELEV, SEC, FURN]
+
+    SpaceType:
+      type: string
+      description: 사무구역 / 화장실 / 탕비실 / 회의실 / 복도 / 기계실 / 로비 / 주차장
+      enum: [OFFICE, RESTROOM, PANTRY, MEETING, CORRIDOR, MACHINE, LOBBY, PARKING]
+
+    RejectionType:
+      type: string
+      enum: [DUPLICATE, OUT_OF_SCOPE, INVALID]
+
+    PhotoType:
+      type: string
+      enum: [REPORT, RESOLUTION]
+
+    HistoryAction:
+      type: string
+      enum:
+        [REGISTER, UPDATE, CANCEL, CLAIM, RELEASE, COMPLETE, ASSIGN, REASSIGN,
+         REVOKE, UPDATE_CLASSIFICATION, REJECT]
+
+    ActorType:
+      type: string
+      description: 행위 주체. `USER` 는 비인증이므로 `actorId` 가 null 이다.
+      enum: [USER, WORKER, ADMIN]
+
+    UserRole:
+      type: string
+      enum: [ADMIN, WORKER]
+
+    # ── 공통 ────────────────────────────────────────────
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: 클라이언트가 분기에 사용하는 오류 코드
+          example: ALREADY_CLAIMED
+        message:
+          type: string
+          description: 사용자에게 표시할 수 있는 메시지
+          example: 이미 다른 작업자가 선점한 민원입니다.
+
+    Category:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/CategoryCode'
+        name: { type: string, example: 급배수·위생 }
+        sortOrder: { type: integer, example: 2 }
+
+    Photo:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 101 }
+        type:
+          $ref: '#/components/schemas/PhotoType'
+        fileUrl: { type: string, format: uri, example: https://cdn.example.com/c/101.jpg }
+        sortOrder: { type: integer, example: 0 }
+
+    HistoryEntry:
+      type: object
+      description: complaint_history 한 행. 민원 상세의 처리 이력 타임라인을 구성한다.
+      properties:
+        action:
+          $ref: '#/components/schemas/HistoryAction'
+        actorType:
+          $ref: '#/components/schemas/ActorType'
+        actorName:
+          type: string
+          nullable: true
+          description: 신고자 행위는 '신고자'로 표시한다.
+          example: 김작업
+        fromStatus:
+          allOf: [{ $ref: '#/components/schemas/ComplaintStatus' }]
+          nullable: true
+        toStatus:
+          allOf: [{ $ref: '#/components/schemas/ComplaintStatus' }]
+          nullable: true
+        note:
+          type: string
+          nullable: true
+          example: 담당 외 카테고리
+        createdAt: { type: string, format: date-time }
+
+    # ── 민원 ────────────────────────────────────────────
+    ComplaintSummary:
+      type: object
+      description: 목록 화면용 요약. 카드 한 장에 표시되는 값만 담는다.
+      properties:
+        id: { type: string, example: M-260915-A7K2Q9 }
+        title: { type: string, example: 6층 화장실 세면대 누수 }
+        floorNo: { type: integer, example: 6 }
+        space:
+          $ref: '#/components/schemas/SpaceType'
+        categoryCode:
+          $ref: '#/components/schemas/CategoryCode'
+        priority:
+          $ref: '#/components/schemas/ComplaintPriority'
+        status:
+          $ref: '#/components/schemas/ComplaintStatus'
+        assigneeId: { type: string, nullable: true, example: W001 }
+        assigneeName: { type: string, nullable: true, example: 김작업 }
+        delayed:
+          type: boolean
+          description: 파생값. 미배정 경과 시간이 우선순위별 임계값을 초과했는지 여부.
+          example: false
+        elapsedMinutes:
+          type: integer
+          description: 파생값. 접수 시각으로부터 경과한 분.
+          example: 42
+        createdAt: { type: string, format: date-time }
+
+    ComplaintDetail:
+      allOf:
+        - $ref: '#/components/schemas/ComplaintSummary'
+        - type: object
+          description: 상세 화면용. 요약에 원문·조치·반려·이력을 더한다.
+          properties:
+            content: { type: string, example: 6층 남자 화장실 안쪽 세면대 하부에서 물이 계속 떨어집니다. }
+            photos:
+              type: array
+              items:
+                $ref: '#/components/schemas/Photo'
+            resolution:
+              type: object
+              nullable: true
+              description: 상태가 COMPLETED 일 때만 존재한다.
+              properties:
+                content: { type: string, example: 배수 트랩 패킹 교체 완료. 누수 없음 확인. }
+                durationMinutes: { type: integer, example: 45 }
+                completedAt: { type: string, format: date-time }
+            rejection:
+              type: object
+              nullable: true
+              description: 상태가 REJECTED 일 때만 존재한다.
+              properties:
+                type:
+                  $ref: '#/components/schemas/RejectionType'
+                reason: { type: string, example: 동일 위치·동일 증상 민원이 이미 접수되어 있습니다. }
+                originalComplaintId: { type: string, nullable: true, example: M-260915-A7K2Q9 }
+            history:
+              type: array
+              items:
+                $ref: '#/components/schemas/HistoryEntry'
+            assignedAt: { type: string, format: date-time, nullable: true }
+            completedAt: { type: string, format: date-time, nullable: true }
+            updatedAt: { type: string, format: date-time }
+
+    ComplaintPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintSummary'
+        page: { type: integer, example: 0 }
+        size: { type: integer, example: 20 }
+        totalElements: { type: integer, example: 37 }
+        totalPages: { type: integer, example: 2 }
+
+    # ── 요청 ────────────────────────────────────────────
+    ComplaintCreateRequest:
+      type: object
+      required: [floorNo, space, categoryCode, priority, title, content, password]
+      properties:
+        floorNo: { type: integer, minimum: 1, maximum: 8, example: 6 }
+        space:
+          $ref: '#/components/schemas/SpaceType'
+        categoryCode:
+          $ref: '#/components/schemas/CategoryCode'
+        priority:
+          $ref: '#/components/schemas/ComplaintPriority'
+        title: { type: string, maxLength: 100, example: 6층 화장실 세면대 누수 }
+        content: { type: string, example: 6층 남자 화장실 안쪽 세면대 하부에서 물이 계속 떨어집니다. }
+        photoUrls:
+          type: array
+          description: 사전 업로드된 이미지 URL 목록
+          items: { type: string, format: uri }
+        password:
+          type: string
+          pattern: '^\d{4}$'
+          description: 수정·취소 시 본인 확인에 사용한다. 조회에는 필요하지 않다.
+          example: '1234'
+
+    ComplaintUpdateRequest:
+      type: object
+      required: [password]
+      description: 전달한 필드만 수정된다. 비밀번호는 본인 확인용이며 변경 대상이 아니다.
+      properties:
+        password:
+          type: string
+          pattern: '^\d{4}$'
+          example: '1234'
+        floorNo: { type: integer, minimum: 1, maximum: 8 }
+        space:
+          $ref: '#/components/schemas/SpaceType'
+        categoryCode:
+          $ref: '#/components/schemas/CategoryCode'
+        priority:
+          $ref: '#/components/schemas/ComplaintPriority'
+        title: { type: string, maxLength: 100 }
+        content: { type: string }
+        photoUrls:
+          type: array
+          items: { type: string, format: uri }
+
+    PasswordRequest:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+          pattern: '^\d{4}$'
+          example: '1234'
+
+    CompletionRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, description: 조치 내용. 필수., example: 배수 트랩 패킹 교체 완료. }
+        durationMinutes: { type: integer, minimum: 0, example: 45 }
+        photoUrls:
+          type: array
+          items: { type: string, format: uri }
+
+    AssignmentRequest:
+      type: object
+      required: [workerId]
+      properties:
+        workerId: { type: string, example: W001 }
+        note: { type: string, maxLength: 255, example: 긴급 건으로 즉시 배정 }
+
+    ClassificationUpdateRequest:
+      type: object
+      description: 전달한 필드만 수정된다. 신고 원문은 이 요청으로 변경할 수 없다.
+      properties:
+        floorNo: { type: integer, minimum: 1, maximum: 8 }
+        space:
+          $ref: '#/components/schemas/SpaceType'
+        categoryCode:
+          $ref: '#/components/schemas/CategoryCode'
+        priority:
+          $ref: '#/components/schemas/ComplaintPriority'
+
+    RejectionRequest:
+      type: object
+      required: [rejectionType, reason]
+      properties:
+        rejectionType:
+          $ref: '#/components/schemas/RejectionType'
+        reason: { type: string, example: 동일 위치·동일 증상 민원이 이미 접수되어 있습니다. }
+        originalComplaintId:
+          type: string
+          nullable: true
+          description: rejectionType 이 DUPLICATE 이면 필수.
+          example: M-260915-A7K2Q9
+
+    LoginRequest:
+      type: object
+      required: [employeeNo, password]
+      properties:
+        employeeNo: { type: string, example: W001 }
+        password: { type: string, format: password, example: '1234' }
+
+    LoginResponse:
+      type: object
+      properties:
+        id: { type: string, example: W001 }
+        name: { type: string, example: 김작업 }
+        role:
+          $ref: '#/components/schemas/UserRole'
+        categories:
+          type: array
+          description: 담당 설비 카테고리. 선점 시 경고 표시 판단에 사용한다.
+          items:
+            $ref: '#/components/schemas/CategoryCode'
+
+    # ── 집계 ────────────────────────────────────────────
+    WorkerSummary:
+      type: object
+      properties:
+        id: { type: string, example: W001 }
+        name: { type: string, example: 김작업 }
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryCode'
+        holding:
+          type: integer
+          description: 현재 보유 중인 처리중 민원 수
+          example: 2
+
+    DashboardResponse:
+      type: object
+      properties:
+        counts:
+          type: object
+          properties:
+            received: { type: integer, example: 8 }
+            inProgress: { type: integer, example: 11 }
+            delayed: { type: integer, example: 3 }
+            completedToday: { type: integer, example: 14 }
+        delayed:
+          type: array
+          description: 개입이 필요한 민원 (선점 지연)
+          items:
+            $ref: '#/components/schemas/ComplaintSummary'
+        workers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkerSummary'
+
+    StatisticsResponse:
+      type: object
+      properties:
+        total: { type: integer, example: 37 }
+        completed: { type: integer, example: 24 }
+        avgMinutes:
+          type: integer
+          description: 접수부터 처리 완료까지의 평균 소요 시간(분)
+          example: 163
+        rejectRate:
+          type: number
+          format: float
+          description: 반려 건수 비율(%)
+          example: 8.3
+        byCategory:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                $ref: '#/components/schemas/CategoryCode'
+              count: { type: integer, example: 12 }
+        byFloor:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: integer, example: 6 }
+              count: { type: integer, example: 9 }

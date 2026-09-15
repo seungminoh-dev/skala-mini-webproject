@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1180" height="560" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#111827">민원 상태 전이도</text>
+  <text x="40" y="68" font-size="12.5" fill="#6b7280">모든 전이는 변경 주체·시각과 함께 complaint_history 에 기록된다.</text>
+
+  <g>
+    <rect x="150" y="150" width="190" height="74" rx="10" fill="#eef2ff" stroke="#c7d3fb" stroke-width="1.5"/>
+    <text x="245.0" y="183.0" text-anchor="middle" font-size="16" font-weight="700" fill="#2f5bea">접수됨</text>
+    <text x="245.0" y="203.0" text-anchor="middle" font-size="12" fill="#6b7280">RECEIVED</text>
+  </g>
+
+  <g>
+    <rect x="495" y="150" width="190" height="74" rx="10" fill="#fef3c7" stroke="#fcd9a5" stroke-width="1.5"/>
+    <text x="590.0" y="183.0" text-anchor="middle" font-size="16" font-weight="700" fill="#b45309">처리중</text>
+    <text x="590.0" y="203.0" text-anchor="middle" font-size="12" fill="#6b7280">IN_PROGRESS</text>
+  </g>
+
+  <g>
+    <rect x="860" y="150" width="190" height="74" rx="10" fill="#dcfce7" stroke="#a7e3bd" stroke-width="1.5"/>
+    <text x="955.0" y="183.0" text-anchor="middle" font-size="16" font-weight="700" fill="#16a34a">처리완료</text>
+    <text x="955.0" y="203.0" text-anchor="middle" font-size="12" fill="#6b7280">COMPLETED</text>
+  </g>
+
+  <g>
+    <rect x="150" y="420" width="190" height="66" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="245.0" y="449.0" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">취소됨</text>
+    <text x="245.0" y="469.0" text-anchor="middle" font-size="12" fill="#6b7280">CANCELED</text>
+  </g>
+
+  <g>
+    <rect x="560" y="420" width="190" height="66" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="655.0" y="449.0" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">반려</text>
+    <text x="655.0" y="469.0" text-anchor="middle" font-size="12" fill="#6b7280">REJECTED</text>
+  </g>
+<circle cx="92" cy="187" r="7" fill="#6b7280"/>
+
+  <polyline points="101,187 144,187" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="92" y="168" text-anchor="middle" font-size="11" fill="#6b7280">접수</text>
+<circle cx="1092" cy="187" r="9" fill="none" stroke="#6b7280" stroke-width="1.5"/><circle cx="1092" cy="187" r="4.5" fill="#6b7280"/>
+
+  <polyline points="1050,187 1079,187" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+
+  <polyline points="340,172 489,172" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="414" y="160" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">선점 / 강제 배정</text>
+  <text x="414" y="175" text-anchor="middle" font-size="11" fill="#6b7280">WORKER · ADMIN</text>
+
+  <polyline points="495,206 346,206" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="420" y="232" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">반납 / 회수</text>
+  <text x="420" y="247" text-anchor="middle" font-size="11" fill="#6b7280">WORKER · ADMIN</text>
+
+  <polyline points="685,187 854,187" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="769" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">처리 결과 등록</text>
+  <text x="769" y="187" text-anchor="middle" font-size="11" fill="#6b7280">WORKER</text>
+
+  <polyline points="245,224 245,414" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="258" y="320" text-anchor="start" font-size="12.5" font-weight="600" fill="#111827">취소</text>
+  <text x="258" y="335" text-anchor="start" font-size="11" fill="#6b7280">USER · 비밀번호 확인</text>
+
+  <polyline points="640,224 640,414" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="653" y="320" text-anchor="start" font-size="12.5" font-weight="600" fill="#111827">반려</text>
+  <text x="653" y="335" text-anchor="start" font-size="11" fill="#6b7280">ADMIN</text>
+
+  <polyline points="310,224 556,416" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="400" y="330" text-anchor="start" font-size="12.5" font-weight="600" fill="#111827">반려</text>
+  <text x="400" y="345" text-anchor="start" font-size="11" fill="#6b7280">ADMIN</text>
+
+  <path d="M 545 150 C 545 100, 635 100, 635 150" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="590" y="92" text-anchor="middle" font-size="12.5" font-weight="600" fill="#111827">재배정</text>
+  <text x="590" y="107" text-anchor="middle" font-size="11" fill="#6b7280">ADMIN · 담당자 교체</text>
+
+  <rect x="820" y="400" width="320" height="108" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="838" y="424" font-size="12.5" font-weight="700" fill="#111827">설계 판단</text>
+  <text x="838" y="446" font-size="11.5" fill="#6b7280">담당자 확정과 조치 착수를 하나의 상태로 통합한다.</text>
+  <text x="838" y="464" font-size="11.5" fill="#6b7280">선점 행위가 곧 처리 시작이므로 별도 단계를 두면</text>
+  <text x="838" y="482" font-size="11.5" fill="#6b7280">작업자에게 실익 없는 조작만 늘어난다. 신고자의</text>
+  <text x="838" y="500" font-size="11.5" fill="#6b7280">완료 확인 단계도 두지 않는다.</text>
+</svg>

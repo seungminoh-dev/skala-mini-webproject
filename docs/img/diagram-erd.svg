@@ -1,0 +1,218 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="870" viewBox="0 0 1480 870" font-family="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif">
+  <defs>
+    <marker id="d" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="5" markerHeight="5">
+      <circle cx="4" cy="4" r="3" fill="#ffffff" stroke="#6b7280" stroke-width="1.4"/>
+    </marker>
+  </defs>
+  <rect width="1480" height="870" fill="#ffffff"/>
+  <text x="40" y="46" font-size="18" font-weight="700" fill="#111827">데이터 모델 (ERD)</text>
+  <text x="40" y="68" font-size="12.5" fill="#6b7280">6 테이블. 위치·조치 결과·반려 정보는 별도 테이블로 분리하지 않고 complaint 에 인라인한다.</text>
+
+  <rect x="60" y="110" width="250" height="116" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 60 118 a 8 8 0 0 1 8 -8 h 234 a 8 8 0 0 1 8 8 v 28 h -250 z" fill="#eef2ff"/>
+  <text x="72" y="127" font-size="13" font-weight="700" fill="#2f5bea">category</text>
+  <text x="298" y="127" text-anchor="end" font-size="10.5" fill="#6b7280">설비 카테고리</text>
+  <line x1="60" y1="146" x2="310" y2="146" stroke="#cbd5e1"/>
+
+  <text x="72" y="160" font-size="11.5" font-weight="700" fill="#111827">code</text>
+  <text x="298" y="160" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  PK</text>
+
+  <text x="72" y="180" font-size="11.5" font-weight="400" fill="#111827">name</text>
+  <text x="298" y="180" text-anchor="end" font-size="10" fill="#6b7280">varchar(50)</text>
+
+  <text x="72" y="200" font-size="11.5" font-weight="400" fill="#111827">sort_order</text>
+  <text x="298" y="200" text-anchor="end" font-size="10" fill="#6b7280">int</text>
+
+  <text x="72" y="220" font-size="11.5" font-weight="400" fill="#111827">is_active</text>
+  <text x="298" y="220" text-anchor="end" font-size="10" fill="#6b7280">boolean</text>
+
+  <rect x="60" y="320" width="250" height="76" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 60 328 a 8 8 0 0 1 8 -8 h 234 a 8 8 0 0 1 8 8 v 28 h -250 z" fill="#eef2ff"/>
+  <text x="72" y="337" font-size="13" font-weight="700" fill="#2f5bea">worker_category</text>
+  <text x="298" y="337" text-anchor="end" font-size="10.5" fill="#6b7280">작업자 담당 카테고리</text>
+  <line x1="60" y1="356" x2="310" y2="356" stroke="#cbd5e1"/>
+
+  <text x="72" y="370" font-size="11.5" font-weight="700" fill="#111827">worker_id</text>
+  <text x="298" y="370" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  PK,FK</text>
+
+  <text x="72" y="390" font-size="11.5" font-weight="700" fill="#111827">category_code</text>
+  <text x="298" y="390" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  PK,FK</text>
+
+  <rect x="60" y="470" width="250" height="156" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 60 478 a 8 8 0 0 1 8 -8 h 234 a 8 8 0 0 1 8 8 v 28 h -250 z" fill="#eef2ff"/>
+  <text x="72" y="487" font-size="13" font-weight="700" fill="#2f5bea">user_account</text>
+  <text x="298" y="487" text-anchor="end" font-size="10.5" fill="#6b7280">직원 (ADMIN / WORKER)</text>
+  <line x1="60" y1="506" x2="310" y2="506" stroke="#cbd5e1"/>
+
+  <text x="72" y="520" font-size="11.5" font-weight="700" fill="#111827">id</text>
+  <text x="298" y="520" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  PK</text>
+
+  <text x="72" y="540" font-size="11.5" font-weight="400" fill="#111827">password_hash</text>
+  <text x="298" y="540" text-anchor="end" font-size="10" fill="#6b7280">varchar(255)</text>
+
+  <text x="72" y="560" font-size="11.5" font-weight="400" fill="#111827">name</text>
+  <text x="298" y="560" text-anchor="end" font-size="10" fill="#6b7280">varchar(50)</text>
+
+  <text x="72" y="580" font-size="11.5" font-weight="400" fill="#111827">role</text>
+  <text x="298" y="580" text-anchor="end" font-size="10" fill="#6b7280">user_role</text>
+
+  <text x="72" y="600" font-size="11.5" font-weight="400" fill="#111827">is_active</text>
+  <text x="298" y="600" text-anchor="end" font-size="10" fill="#6b7280">boolean</text>
+
+  <text x="72" y="620" font-size="11.5" font-weight="400" fill="#111827">created_at</text>
+  <text x="298" y="620" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <rect x="530" y="110" width="350" height="416" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 530 118 a 8 8 0 0 1 8 -8 h 334 a 8 8 0 0 1 8 8 v 28 h -350 z" fill="#eef2ff"/>
+  <text x="542" y="127" font-size="13" font-weight="700" fill="#2f5bea">complaint</text>
+  <text x="868" y="127" text-anchor="end" font-size="10.5" fill="#6b7280">민원 본체</text>
+  <line x1="530" y1="146" x2="880" y2="146" stroke="#cbd5e1"/>
+
+  <text x="542" y="160" font-size="11.5" font-weight="700" fill="#111827">id</text>
+  <text x="868" y="160" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  PK</text>
+
+  <text x="542" y="180" font-size="11.5" font-weight="400" fill="#111827">floor_no</text>
+  <text x="868" y="180" text-anchor="end" font-size="10" fill="#6b7280">int</text>
+
+  <text x="542" y="200" font-size="11.5" font-weight="400" fill="#111827">space</text>
+  <text x="868" y="200" text-anchor="end" font-size="10" fill="#6b7280">space_type</text>
+
+  <text x="542" y="220" font-size="11.5" font-weight="700" fill="#111827">category_code</text>
+  <text x="868" y="220" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  FK</text>
+
+  <text x="542" y="240" font-size="11.5" font-weight="400" fill="#111827">priority</text>
+  <text x="868" y="240" text-anchor="end" font-size="10" fill="#6b7280">complaint_priority</text>
+
+  <text x="542" y="260" font-size="11.5" font-weight="400" fill="#111827">status</text>
+  <text x="868" y="260" text-anchor="end" font-size="10" fill="#6b7280">complaint_status</text>
+
+  <text x="542" y="280" font-size="11.5" font-weight="400" fill="#111827">title</text>
+  <text x="868" y="280" text-anchor="end" font-size="10" fill="#6b7280">varchar(100)</text>
+
+  <text x="542" y="300" font-size="11.5" font-weight="400" fill="#111827">content</text>
+  <text x="868" y="300" text-anchor="end" font-size="10" fill="#6b7280">text</text>
+
+  <text x="542" y="320" font-size="11.5" font-weight="400" fill="#111827">password_hash</text>
+  <text x="868" y="320" text-anchor="end" font-size="10" fill="#6b7280">varchar(255)</text>
+
+  <text x="542" y="340" font-size="11.5" font-weight="700" fill="#111827">assignee_id</text>
+  <text x="868" y="340" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  FK</text>
+
+  <text x="542" y="360" font-size="11.5" font-weight="400" fill="#111827">resolution_content</text>
+  <text x="868" y="360" text-anchor="end" font-size="10" fill="#6b7280">text</text>
+
+  <text x="542" y="380" font-size="11.5" font-weight="400" fill="#111827">resolution_minutes</text>
+  <text x="868" y="380" text-anchor="end" font-size="10" fill="#6b7280">int</text>
+
+  <text x="542" y="400" font-size="11.5" font-weight="400" fill="#111827">rejection_type</text>
+  <text x="868" y="400" text-anchor="end" font-size="10" fill="#6b7280">rejection_type</text>
+
+  <text x="542" y="420" font-size="11.5" font-weight="400" fill="#111827">rejection_reason</text>
+  <text x="868" y="420" text-anchor="end" font-size="10" fill="#6b7280">text</text>
+
+  <text x="542" y="440" font-size="11.5" font-weight="700" fill="#111827">original_complaint_id</text>
+  <text x="868" y="440" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  FK</text>
+
+  <text x="542" y="460" font-size="11.5" font-weight="400" fill="#111827">created_at</text>
+  <text x="868" y="460" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <text x="542" y="480" font-size="11.5" font-weight="400" fill="#111827">assigned_at</text>
+  <text x="868" y="480" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <text x="542" y="500" font-size="11.5" font-weight="400" fill="#111827">completed_at</text>
+  <text x="868" y="500" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <text x="542" y="520" font-size="11.5" font-weight="400" fill="#111827">updated_at</text>
+  <text x="868" y="520" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <rect x="1090" y="110" width="330" height="156" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 1090 118 a 8 8 0 0 1 8 -8 h 314 a 8 8 0 0 1 8 8 v 28 h -330 z" fill="#eef2ff"/>
+  <text x="1102" y="127" font-size="13" font-weight="700" fill="#2f5bea">complaint_photo</text>
+  <text x="1408" y="127" text-anchor="end" font-size="10.5" fill="#6b7280">신고·조치 사진</text>
+  <line x1="1090" y1="146" x2="1420" y2="146" stroke="#cbd5e1"/>
+
+  <text x="1102" y="160" font-size="11.5" font-weight="700" fill="#111827">id</text>
+  <text x="1408" y="160" text-anchor="end" font-size="10" fill="#6b7280">bigint  PK</text>
+
+  <text x="1102" y="180" font-size="11.5" font-weight="700" fill="#111827">complaint_id</text>
+  <text x="1408" y="180" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  FK</text>
+
+  <text x="1102" y="200" font-size="11.5" font-weight="400" fill="#111827">type</text>
+  <text x="1408" y="200" text-anchor="end" font-size="10" fill="#6b7280">photo_type</text>
+
+  <text x="1102" y="220" font-size="11.5" font-weight="400" fill="#111827">file_url</text>
+  <text x="1408" y="220" text-anchor="end" font-size="10" fill="#6b7280">varchar(500)</text>
+
+  <text x="1102" y="240" font-size="11.5" font-weight="400" fill="#111827">sort_order</text>
+  <text x="1408" y="240" text-anchor="end" font-size="10" fill="#6b7280">int</text>
+
+  <text x="1102" y="260" font-size="11.5" font-weight="400" fill="#111827">uploaded_at</text>
+  <text x="1408" y="260" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <rect x="1090" y="390" width="330" height="216" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <path d="M 1090 398 a 8 8 0 0 1 8 -8 h 314 a 8 8 0 0 1 8 8 v 28 h -330 z" fill="#eef2ff"/>
+  <text x="1102" y="407" font-size="13" font-weight="700" fill="#2f5bea">complaint_history</text>
+  <text x="1408" y="407" text-anchor="end" font-size="10.5" fill="#6b7280">상태 변경 이력 (append-only)</text>
+  <line x1="1090" y1="426" x2="1420" y2="426" stroke="#cbd5e1"/>
+
+  <text x="1102" y="440" font-size="11.5" font-weight="700" fill="#111827">id</text>
+  <text x="1408" y="440" text-anchor="end" font-size="10" fill="#6b7280">bigint  PK</text>
+
+  <text x="1102" y="460" font-size="11.5" font-weight="700" fill="#111827">complaint_id</text>
+  <text x="1408" y="460" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  FK</text>
+
+  <text x="1102" y="480" font-size="11.5" font-weight="400" fill="#111827">action</text>
+  <text x="1408" y="480" text-anchor="end" font-size="10" fill="#6b7280">history_action</text>
+
+  <text x="1102" y="500" font-size="11.5" font-weight="400" fill="#111827">actor_type</text>
+  <text x="1408" y="500" text-anchor="end" font-size="10" fill="#6b7280">actor_type</text>
+
+  <text x="1102" y="520" font-size="11.5" font-weight="700" fill="#111827">actor_id</text>
+  <text x="1408" y="520" text-anchor="end" font-size="10" fill="#6b7280">varchar(20)  FK</text>
+
+  <text x="1102" y="540" font-size="11.5" font-weight="400" fill="#111827">from_status</text>
+  <text x="1408" y="540" text-anchor="end" font-size="10" fill="#6b7280">complaint_status</text>
+
+  <text x="1102" y="560" font-size="11.5" font-weight="400" fill="#111827">to_status</text>
+  <text x="1408" y="560" text-anchor="end" font-size="10" fill="#6b7280">complaint_status</text>
+
+  <text x="1102" y="580" font-size="11.5" font-weight="400" fill="#111827">note</text>
+  <text x="1408" y="580" text-anchor="end" font-size="10" fill="#6b7280">varchar(255)</text>
+
+  <text x="1102" y="600" font-size="11.5" font-weight="400" fill="#111827">created_at</text>
+  <text x="1408" y="600" text-anchor="end" font-size="10" fill="#6b7280">timestamp</text>
+
+  <polyline points="310,156.0 420,156.0 420,216.0 530,216.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="424" y="208.0" text-anchor="start" font-size="10.5" font-weight="700" fill="#6b7280">1:N</text>
+
+  <polyline points="90,226 30,226 30,386.0 60,386.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="36" y="378.0" text-anchor="start" font-size="10.5" font-weight="700" fill="#6b7280">M:N</text>
+
+  <polyline points="90,470 16,470 16,366.0 60,366.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="0" y="0" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6b7280"></text>
+
+  <polyline points="310,516.0 455,516.0 455,336.0 530,336.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="459" y="328.0" text-anchor="start" font-size="10.5" font-weight="700" fill="#6b7280">1:N</text>
+
+  <polyline points="880,156.0 985,156.0 985,176.0 1090,176.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="989" y="168.0" text-anchor="start" font-size="10.5" font-weight="700" fill="#6b7280">1:N</text>
+
+  <polyline points="880,256.0 1010,256.0 1010,456.0 1090,456.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="1014" y="448.0" text-anchor="start" font-size="10.5" font-weight="700" fill="#6b7280">1:N</text>
+
+  <polyline points="310,556.0 400,556.0 400,800 1045,800 1045,516.0 1090,516.0" fill="none" stroke="#6b7280" stroke-width="1.4" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="700" y="792" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6b7280">1:N  actor</text>
+
+  <path d="M 530 436.0 h -34 v -280.0 h 34"
+        fill="none" stroke="#6b7280" stroke-width="1.4" stroke-dasharray="4 3" marker-start="url(#d)" marker-end="url(#d)"/>
+  <text x="490" y="296.0" text-anchor="end" font-size="10.5" font-weight="700" fill="#6b7280">자기참조</text>
+  <text x="490" y="310.0" text-anchor="end" font-size="10" fill="#6b7280">중복 반려 원본</text>
+
+  <rect x="530" y="600" width="350" height="128" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="548" y="624" font-size="12.5" font-weight="700" fill="#111827">인덱스</text>
+  <text x="548" y="646" font-size="11" fill="#6b7280">(status, priority, created_at) — 미배정 목록 정렬</text>
+  <text x="548" y="664" font-size="11" fill="#6b7280">(assignee_id, status) — 내 작업 · 작업자별 보유</text>
+  <text x="548" y="682" font-size="11" fill="#6b7280">(floor_no, space, category_code, status) — 중복 탐색</text>
+  <text x="548" y="700" font-size="11" fill="#6b7280">(category_code, created_at) — 통계 집계</text>
+  <text x="548" y="718" font-size="11" fill="#6b7280">complaint_history (complaint_id, created_at) — 타임라인</text>
+</svg>

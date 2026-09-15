@@ -1,0 +1,209 @@
+// ============================================================
+// 오피스 시설 민원 처리 서비스 — 데이터 모델
+// dbdiagram.io 에 붙여넣어 시각화한다.
+//
+// 설계 원칙
+//  1. 화면에 표시되는 모든 데이터 필드가 어딘가의 속성으로 존재한다.
+//  2. 상태 변경은 complaint.status 를 갱신하는 동시에 complaint_history 에 append 한다.
+//     "누가 · 언제 · 무엇을 했는가"는 전부 이력 테이블이 담당하므로,
+//     본체 테이블에 별도의 담당자·시각 컬럼을 늘리지 않는다.
+//  3. MVP 범위를 넘는 정규화는 하지 않는다. 표에 담기는 값이 실제로 늘어나거나
+//     독립적으로 조회될 때만 테이블을 분리한다.
+// ============================================================
+
+// ── 열거형 ──────────────────────────────────────────────────
+
+Enum user_role {
+  ADMIN   [note: '시설물 관리 소장']
+  WORKER  [note: '시설물 작업자']
+}
+
+Enum complaint_status {
+  RECEIVED    [note: '접수됨 — 미배정. 선점 대상']
+  IN_PROGRESS [note: '처리중 — 담당자 확정 및 조치 진행']
+  COMPLETED   [note: '처리완료 — 최종 상태']
+  REJECTED    [note: '반려 — 중복 또는 관리 대상 외']
+  CANCELED    [note: '취소됨 — 신고자 철회']
+}
+
+Enum complaint_priority {
+  URGENT [note: '긴급 — 선점 대기 1시간 초과 시 지연']
+  NORMAL [note: '보통 — 6시간']
+  LOW    [note: '낮음 — 24시간']
+}
+
+Enum space_type {
+  OFFICE    [note: '사무구역']
+  RESTROOM  [note: '화장실']
+  PANTRY    [note: '탕비실']
+  MEETING   [note: '회의실']
+  CORRIDOR  [note: '복도']
+  MACHINE   [note: '기계실']
+  LOBBY     [note: '로비']
+  PARKING   [note: '주차장']
+}
+
+Enum rejection_type {
+  DUPLICATE     [note: '중복 민원 — original_complaint_id 필수']
+  OUT_OF_SCOPE  [note: '관리 대상 외']
+  INVALID       [note: '내용 확인 불가']
+}
+
+Enum photo_type {
+  REPORT     [note: '신고 시 첨부']
+  RESOLUTION [note: '조치 결과 첨부']
+}
+
+Enum history_action {
+  REGISTER
+  UPDATE                 [note: '신고자의 원문 수정']
+  CANCEL
+  CLAIM                  [note: '작업자 선점']
+  RELEASE                [note: '작업자 반납']
+  COMPLETE
+  ASSIGN                 [note: '관리소장 강제 배정']
+  REASSIGN
+  REVOKE                 [note: '관리소장 배정 회수']
+  UPDATE_CLASSIFICATION  [note: '관리소장의 분류 정보 수정']
+  REJECT
+}
+
+Enum actor_type {
+  USER   [note: '건물 사용자 — 비인증이므로 actor_id 가 NULL']
+  WORKER
+  ADMIN
+}
+
+// ── 기준 데이터 ─────────────────────────────────────────────
+
+Table category {
+  code       varchar(20) [pk, note: 'ELEC, WATER, HVAC, ELEV, SEC, FURN']
+  name       varchar(50) [not null, note: '전기·조명, 급배수·위생, 공조, 승강기, 출입·보안, 집기·비품']
+  sort_order int         [not null, default: 0]
+  is_active  boolean     [not null, default: true]
+
+  Note: '설비 카테고리. 구축 시점에 등록하는 기준 데이터이며 관리 화면은 2차 범위.'
+}
+
+// ── 직원 ────────────────────────────────────────────────────
+
+Table user_account {
+  id            varchar(20)  [pk, note: '사번과 동일. 예) S001, W001']
+  password_hash varchar(255) [not null]
+  name          varchar(50)  [not null]
+  role          user_role    [not null]
+  is_active     boolean      [not null, default: true]
+  created_at    timestamp    [not null]
+
+  Note: 'ADMIN / WORKER 만 계정을 가진다. 건물 사용자(USER)는 비인증이므로 이 테이블에 존재하지 않는다.'
+}
+
+Table worker_category {
+  worker_id     varchar(20) [ref: > user_account.id]
+  category_code varchar(20) [ref: > category.code]
+
+  Indexes {
+    (worker_id, category_code) [pk]
+  }
+
+  Note: '''
+  작업자의 담당 설비 카테고리 (M:N).
+  P-01에 따라 담당 외 카테고리도 선점할 수 있으므로 이 관계는 "제한"이 아니라
+  선점 시 경고를 띄울지 판단하는 근거이자, 관리소장이 배정 대상을 고르는 기준이다.
+  다목적 작업자는 전 카테고리 행을 가진다.
+  '''
+}
+
+// ── 민원 ────────────────────────────────────────────────────
+
+Table complaint {
+  id            varchar(20)        [pk, note: 'M-YYMMDD-XXXXXX. 순차 증가값이 아닌 비순차 식별자']
+  floor_no      int                [not null, note: '1~8']
+  space         space_type         [not null]
+  category_code varchar(20)        [not null, ref: > category.code]
+  priority      complaint_priority [not null]
+  status        complaint_status   [not null, default: 'RECEIVED']
+  title         varchar(100)       [not null]
+  content       text               [not null]
+  password_hash varchar(255)       [not null, note: '수정·취소용 4자리 비밀번호. 평문 저장하지 않는다']
+  assignee_id   varchar(20)        [null, ref: > user_account.id, note: 'RECEIVED 상태에서는 NULL']
+
+  resolution_content  text [null, note: '조치 내용. COMPLETED 일 때만 존재']
+  resolution_minutes  int  [null, note: '소요 시간(분)']
+
+  rejection_type        rejection_type [null]
+  rejection_reason      text           [null]
+  original_complaint_id varchar(20)    [null, ref: > complaint.id, note: '중복 반려 시 원본 민원. 자기참조']
+
+  created_at   timestamp [not null]
+  assigned_at  timestamp [null]
+  completed_at timestamp [null]
+  updated_at   timestamp [not null]
+
+  Indexes {
+    (status, priority, created_at)       [name: 'idx_complaint_unassigned']
+    (assignee_id, status)                [name: 'idx_complaint_assignee']
+    (floor_no, space, category_code, status) [name: 'idx_complaint_duplicate_scan']
+    (category_code, created_at)          [name: 'idx_complaint_stats']
+  }
+
+  Note: '''
+  민원 본체.
+
+  위치를 별도 테이블로 분리하지 않고 (floor_no, space) 두 속성으로 둔다.
+  층·공간은 민원의 분류 속성일 뿐 독립적으로 조회·관리되는 대상이 아니며,
+  등록 화면의 두 드롭다운과 1:1로 대응한다.
+
+  조치 결과와 반려 정보도 1:1 테이블로 분리하지 않고 인라인한다.
+  각각 상태가 COMPLETED / REJECTED 일 때만 채워지는 종결 정보이고,
+  "누가 언제 처리했는가"는 complaint_history 가 이미 보관하기 때문이다.
+
+  인덱스는 화면별 조회 패턴에 대응한다.
+   - idx_complaint_unassigned     : 미배정 목록의 우선순위·경과 시간 정렬 (FR-201)
+   - idx_complaint_assignee       : 내 작업 목록(FR-204), 작업자별 보유 건수(FR-303)
+   - idx_complaint_duplicate_scan : 동일 위치·카테고리 진행 중 민원 조회 (FR-206)
+   - idx_complaint_stats          : 카테고리·기간별 집계 (FR-309)
+
+  담당자 확정과 조치 착수를 분리하지 않으므로, assignee_id 가 NULL 인지 여부가
+  곧 선점 가능 여부다.
+  '''
+}
+
+Table complaint_photo {
+  id           bigint       [pk, increment]
+  complaint_id varchar(20)  [not null, ref: > complaint.id]
+  type         photo_type   [not null]
+  file_url     varchar(500) [not null]
+  sort_order   int          [not null, default: 0]
+  uploaded_at  timestamp    [not null]
+
+  Indexes {
+    (complaint_id, type, sort_order) [name: 'idx_photo_complaint']
+  }
+
+  Note: '신고 사진과 조치 사진을 type 으로 구분해 한 테이블에서 관리한다. 민원당 여러 장이므로 분리한다.'
+}
+
+Table complaint_history {
+  id           bigint           [pk, increment]
+  complaint_id varchar(20)      [not null, ref: > complaint.id]
+  action       history_action   [not null]
+  actor_type   actor_type       [not null]
+  actor_id     varchar(20)      [null, ref: > user_account.id, note: 'USER는 비인증이므로 NULL']
+  from_status  complaint_status [null]
+  to_status    complaint_status [null, note: '상태 전이가 없는 수정 행위는 NULL']
+  note         varchar(255)     [null, note: '담당 외 카테고리 선점, 변경된 필드명, 원본 민원 번호 등']
+  created_at   timestamp        [not null]
+
+  Indexes {
+    (complaint_id, created_at) [name: 'idx_history_complaint']
+  }
+
+  Note: '''
+  상태 변경 및 처리 이력. 이 서비스의 핵심 가치("이력 축적")를 담는 테이블이다.
+   - 민원 상세 화면의 처리 이력 타임라인이 이 테이블을 그대로 렌더한다.
+   - 평균 처리 시간은 REGISTER ~ COMPLETE 간격으로 산출한다.
+   - 강제 배정(ASSIGN) 비율이 높은 카테고리는 정기 정비 요청의 근거가 된다. (AS-01)
+  append-only 로 운용하며 수정·삭제하지 않는다.
+  '''
+}
