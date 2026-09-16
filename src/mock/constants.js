@@ -1,15 +1,18 @@
 // 도메인 상수 — 기술서 1.1 / 9.x 정책과 1:1로 대응한다.
 
+// desc: 신고자 화면에서만 붙이는 풀이말 — "공조?"처럼 용어를 모르는 사용자를 위한 것.
 export const CATEGORIES = [
-  { code: 'ELEC', name: '전기·조명' },
-  { code: 'WATER', name: '급배수·위생' },
-  { code: 'HVAC', name: '공조' },
-  { code: 'ELEV', name: '승강기' },
-  { code: 'SEC', name: '출입·보안' },
-  { code: 'FURN', name: '집기·비품' }
+  { code: 'ELEC', name: '전기·조명', desc: '전등·콘센트·스위치' },
+  { code: 'WATER', name: '급배수·위생', desc: '세면대·변기·싱크대·누수' },
+  { code: 'HVAC', name: '공조', desc: '냉난방·환기' },
+  { code: 'ELEV', name: '승강기', desc: '엘리베이터' },
+  { code: 'SEC', name: '출입·보안', desc: '출입문·카드 인식' },
+  { code: 'FURN', name: '집기·비품', desc: '책상·의자·정수기 등' },
+  { code: 'ETC', name: '기타·모름', desc: '어디 문제인지 모르겠어요' }
 ]
 
-export const FLOORS = Array.from({ length: 8 }, (_, i) => `${i + 1}층`)
+// 지하 2층(주차장·기계실) ~ 지상 8층. floor_no 는 지하를 음수로 둔다.
+export const FLOORS = ['지하 2층', '지하 1층', ...Array.from({ length: 8 }, (_, i) => `${i + 1}층`)]
 
 export const SPACES = ['사무구역', '화장실', '탕비실', '회의실', '복도', '기계실', '로비', '주차장']
 

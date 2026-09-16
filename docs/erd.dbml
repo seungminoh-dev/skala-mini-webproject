@@ -118,7 +118,7 @@ Table worker_category {
 
 Table complaint {
   id            varchar(20)        [pk, note: 'M-YYMMDD-XXXXXX. 순차 증가값이 아닌 비순차 식별자']
-  floor_no      int                [not null, note: '1~8']
+  floor_no      int                [not null, note: '-2~8, 음수는 지하층 (0 미사용)']
   space         space_type         [not null]
   category_code varchar(20)        [not null, ref: > category.code]
   priority      complaint_priority [not null]

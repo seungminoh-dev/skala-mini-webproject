@@ -112,7 +112,7 @@ paths:
             $ref: '#/components/schemas/CategoryCode'
         - name: floorNo
           in: query
-          schema: { type: integer, minimum: 1, maximum: 8 }
+          schema: { type: integer, minimum: -2, maximum: 8 }
         - name: priority
           in: query
           schema:
@@ -755,8 +755,11 @@ components:
 
     CategoryCode:
       type: string
-      description: 전기·조명 / 급배수·위생 / 공조 / 승강기 / 출입·보안 / 집기·비품
-      enum: [ELEC, WATER, HVAC, ELEV, SEC, FURN]
+      description: |
+        전기·조명 / 급배수·위생 / 공조 / 승강기 / 출입·보안 / 집기·비품 / 기타·미분류.
+        `ETC` 는 신고자가 설비를 판단하지 못할 때를 위한 값으로,
+        관리소장의 분류 정보 수정(FR-307) 대상이다.
+      enum: [ELEC, WATER, HVAC, ELEV, SEC, FURN, ETC]
 
     SpaceType:
       type: string
@@ -923,7 +926,12 @@ components:
       type: object
       required: [floorNo, space, categoryCode, priority, title, content, password]
       properties:
-        floorNo: { type: integer, minimum: 1, maximum: 8, example: 6 }
+        floorNo:
+          type: integer
+          minimum: -2
+          maximum: 8
+          example: 6
+          description: 지하 2층 ~ 지상 8층. 지하는 음수(-1 = 지하 1층)이며 0은 쓰지 않는다.
         space:
           $ref: '#/components/schemas/SpaceType'
         categoryCode:
@@ -951,7 +959,7 @@ components:
           type: string
           pattern: '^\d{4}$'
           example: '1234'
-        floorNo: { type: integer, minimum: 1, maximum: 8 }
+        floorNo: { type: integer, minimum: -2, maximum: 8 }
         space:
           $ref: '#/components/schemas/SpaceType'
         categoryCode:
@@ -994,7 +1002,7 @@ components:
       type: object
       description: 전달한 필드만 수정된다. 신고 원문은 이 요청으로 변경할 수 없다.
       properties:
-        floorNo: { type: integer, minimum: 1, maximum: 8 }
+        floorNo: { type: integer, minimum: -2, maximum: 8 }
         space:
           $ref: '#/components/schemas/SpaceType'
         categoryCode:

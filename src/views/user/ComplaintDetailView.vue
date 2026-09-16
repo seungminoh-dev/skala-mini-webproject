@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PubShell from '@/components/PubShell.vue'
-import StatusMark from '@/components/StatusMark.vue'
 import AppDialog from '@/components/AppDialog.vue'
 import { cancelComplaint, getComplaint, verifyPassword } from '@/mock/api'
 import { categoryName, priorityName, rejectReasonName } from '@/mock/constants'
+import { statusMark } from '@/utils/labels'
 import { actionLabel, durationLabel, formatDateTime } from '@/utils/format'
 import { verifyStore } from '@/stores/verify'
 import { devModal } from '@/utils/devModal'
@@ -24,6 +24,20 @@ async function load() {
   if (devModal('cancel')) { verifyStore.set(id, '0000'); confirmCancel.value = true }
 }
 const open = () => c.value?.status === 'RECEIVED'
+
+// 신고자에게 상태는 코드가 아니라 문장이다. 담당 기사도 여기서 함께 말한다.
+const hero = computed(() => {
+  if (!c.value) return ''
+  switch (c.value.status) {
+    case 'RECEIVED': return '접수 완료 — 담당 기사 배정을 기다리고 있습니다'
+    case 'IN_PROGRESS': return `작업 중 — ${c.value.assigneeName} 기사가 맡고 있습니다`
+    case 'COMPLETED': return c.value.assigneeName ? `처리 완료 — ${c.value.assigneeName} 기사가 조치했습니다` : '처리 완료'
+    case 'REJECTED': return '처리하지 않기로 했습니다'
+    case 'CANCELED': return '취소된 민원입니다'
+    default: return c.value.status
+  }
+})
+
 function ask(next) { mode.value = next; pw.value = ''; pwError.value = '' }
 async function submitPw() {
   if (pw.value.length !== 4 || pwBusy.value) return
@@ -49,30 +63,31 @@ async function doCancel() {
     <p v-else-if="loadError" class="note warn" style="margin-top: 40px">{{ loadError }}</p>
 
     <template v-else-if="c">
-      <div style="padding: 40px 0 24px; border-bottom: 1px solid var(--line-2); display: flex; align-items: flex-start; gap: 20px">
+      <router-link to="/" class="backlink" style="margin-top: 26px">← 처음으로</router-link>
+
+      <div style="padding: 18px 0 24px; border-bottom: 1px solid var(--line-2); display: flex; align-items: flex-end; gap: 20px">
         <div style="flex: 1; min-width: 0">
-          <div style="display: flex; align-items: center; gap: 12px">
-            <StatusMark :status="c.status" who="user" :late="c.delayed" />
-            <span class="mono hint">{{ c.id }}</span>
+          <div class="shero" :class="statusMark(c.status)">
+            <i /><span class="t">{{ hero }}</span>
           </div>
-          <h1 class="display" style="font-size: 28px; margin-top: 12px">{{ c.title }}</h1>
+          <h1 style="font-size: 17px; font-weight: 600; color: var(--text); margin-top: 14px; letter-spacing: -0.01em">
+            {{ c.title }}
+          </h1>
+          <p style="margin-top: 7px; font-size: 13px; color: var(--muted)">
+            <span class="mono">{{ c.id }}</span>
+            <span style="margin: 0 7px; color: var(--line-2)">|</span>
+            {{ c.floor }} {{ c.space }} · {{ categoryName(c.categoryCode) }} · 긴급도 {{ priorityName(c.priority) }}
+          </p>
         </div>
-        <div v-if="open()" class="btn-row">
-          <button class="btn line" @click="ask('edit')">내용 고치기</button>
-          <button class="btn warn-line" @click="ask('cancel')">신고 취소</button>
+        <div v-if="open()" class="btn-row" style="flex: none">
+          <button class="btn line" @click="ask('edit')">민원 수정</button>
+          <button class="btn warn-line" @click="ask('cancel')">민원 취소</button>
         </div>
       </div>
 
-      <div class="defs" style="margin-top: 24px">
-        <div><dt>위치</dt><dd>{{ c.floor }} · {{ c.space }}</dd></div>
-        <div><dt>설비</dt><dd>{{ categoryName(c.categoryCode) }}</dd></div>
-        <div><dt>긴급도</dt><dd>{{ priorityName(c.priority) }}</dd></div>
-        <div><dt>담당 기사</dt><dd>{{ c.assigneeName ?? '배정 전' }}</dd></div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 44px; margin-top: 34px; align-items: start">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 44px; margin-top: 30px; align-items: start">
         <section>
-          <p class="sect">신고 내용</p>
+          <p class="sect">등록한 내용</p>
           <p style="font-size: 14.5px; line-height: 1.75; white-space: pre-wrap">{{ c.content }}</p>
           <p v-if="c.photos?.length" class="hint mono" style="margin-top: 10px">{{ c.photos.map((p) => p.fileUrl ?? p).join(', ') }}</p>
 
@@ -94,8 +109,8 @@ async function doCancel() {
           </template>
 
           <div v-if="!open()" class="note warn" style="margin-top: 30px">
-            <strong>지금은 고치거나 취소할 수 없습니다.</strong><br />
-            담당 기사가 배정된 뒤에는 신고 내용을 바꿀 수 없습니다. 추가로 알릴 내용이 있으면 새로 신고해 주세요.
+            <strong>지금은 수정하거나 취소할 수 없습니다.</strong><br />
+            담당 기사가 배정된 뒤에는 내용을 바꿀 수 없습니다. 추가로 알릴 내용이 있으면 새로 등록해 주세요.
           </div>
         </section>
 
@@ -112,7 +127,7 @@ async function doCancel() {
     </template>
 
     <AppDialog v-if="mode" title="4자리 비밀번호"
-      :message="mode === 'edit' ? '신고할 때 입력한 비밀번호를 넣어주세요.' : '취소하려면 비밀번호가 필요합니다.'"
+      :message="mode === 'edit' ? '등록할 때 입력한 비밀번호를 넣어주세요.' : '취소하려면 비밀번호가 필요합니다.'"
       @close="mode = null">
       <template #body>
         <input v-model="pw" class="input mono" inputmode="numeric" maxlength="4" placeholder="0000"
@@ -125,12 +140,12 @@ async function doCancel() {
       </template>
     </AppDialog>
 
-    <AppDialog v-if="confirmCancel" danger title="신고를 취소할까요?"
-      message="취소하면 되돌릴 수 없습니다. 같은 내용을 다시 알리려면 새로 신고해야 합니다."
+    <AppDialog v-if="confirmCancel" danger title="민원을 취소할까요?"
+      message="취소하면 되돌릴 수 없습니다. 같은 내용을 다시 알리려면 새로 등록해야 합니다."
       @close="confirmCancel = false">
       <template #actions>
         <button class="btn line" @click="confirmCancel = false">그대로 두기</button>
-        <button class="btn warn" :disabled="cancelBusy" @click="doCancel">{{ cancelBusy ? '처리 중…' : '신고 취소' }}</button>
+        <button class="btn warn" :disabled="cancelBusy" @click="doCancel">{{ cancelBusy ? '처리 중…' : '민원 취소' }}</button>
       </template>
     </AppDialog>
   </PubShell>

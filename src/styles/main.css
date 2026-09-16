@@ -315,6 +315,21 @@ h1, h2, h3, p { margin: 0; }
 }
 .ftog:hover { border-color: var(--sky); color: var(--blue); }
 .ftog.on { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 600; }
+/* 긴급도 선택 — 경고색은 "긴급"이 선택됐을 때 단 하나만 쓴다 */
+.ftog.on.alert { background: var(--alert); border-color: var(--alert); }
+
+.backlink { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.backlink:hover { color: var(--blue); }
+
+/* 신고자 상세 — 상태를 문장으로 크게 말한다. 인디케이터는 채움 방식으로 구분. */
+.shero { display: flex; align-items: center; gap: 11px; }
+.shero i { width: 11px; height: 11px; border-radius: 1px; flex: none; }
+.shero.st-wait i { border: 2.5px solid var(--sky); }
+.shero.st-work i { background: var(--blue); }
+.shero.st-done i { background: var(--ice); border: 1px solid var(--sky); }
+.shero.st-off i { background: var(--line-2); }
+.shero.st-late i { background: var(--alert); }
+.shero .t { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
 
 /* ── 정보 표시 ───────────────────────────────────────── */
 

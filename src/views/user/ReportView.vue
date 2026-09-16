@@ -30,9 +30,8 @@ async function submit() {
 
 <template>
   <PubShell narrow>
-    <div style="padding: 44px 0 26px; border-bottom: 1px solid var(--line-2)">
-      <p class="eyebrow">STEP 1 / 2</p>
-      <h1 class="display" style="font-size: 30px; margin-top: 10px">민원 신고</h1>
+    <div style="padding: 40px 0 26px; border-bottom: 1px solid var(--line-2)">
+      <h1 class="display" style="font-size: 30px">민원 등록</h1>
       <p class="lede" style="font-size: 14px; margin-top: 8px">어디가, 어떻게 불편한지 알려주세요.</p>
     </div>
 
@@ -54,15 +53,17 @@ async function submit() {
       <div class="field">
         <label class="label">어떤 설비인가요</label>
         <select v-model="form.categoryCode" class="select">
-          <option value="">설비 선택</option>
-          <option v-for="c in CATEGORIES" :key="c.code" :value="c.code">{{ c.name }}</option>
+          <option value="">설비 선택 — 모르면 "기타·모름"을 고르세요</option>
+          <option v-for="c in CATEGORIES" :key="c.code" :value="c.code">{{ c.name }} ({{ c.desc }})</option>
         </select>
+        <p class="hint" style="margin-top: 6px">잘못 골라도 됩니다. 관리소장이 확인 후 바로잡습니다.</p>
       </div>
 
       <div class="field">
         <label class="label">긴급도</label>
         <div class="filters">
-          <button v-for="p in PRIORITIES" :key="p.code" class="ftog" :class="{ on: form.priority === p.code }"
+          <button v-for="p in PRIORITIES" :key="p.code" class="ftog"
+            :class="{ on: form.priority === p.code, alert: p.code === 'URGENT' && form.priority === 'URGENT' }"
             @click="form.priority = p.code">{{ p.name }}</button>
         </div>
       </div>
@@ -87,17 +88,18 @@ async function submit() {
       </div>
 
       <div class="field">
-        <label class="label">4자리 비밀번호</label>
-        <input v-model="form.password" class="input mono" inputmode="numeric" maxlength="4" placeholder="0000" style="max-width: 140px" />
-        <p class="hint" style="margin-top: 6px">신고 내용을 고치거나 취소할 때만 씁니다. 조회에는 필요 없습니다.</p>
+        <label class="label">수정·취소용 비밀번호</label>
+        <input v-model="form.password" class="input mono" inputmode="numeric" maxlength="4" placeholder="숫자 4자리" style="max-width: 140px" />
+        <p class="hint" style="margin-top: 6px">이 민원을 나중에 수정하거나 취소할 때 확인하는 번호입니다.</p>
       </div>
 
       <p v-if="error" class="note warn" style="margin-top: 18px">{{ error }}</p>
 
-      <div style="margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2)">
+      <div style="margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); display: flex; align-items: center; gap: 14px">
         <button class="btn lg" :disabled="!valid || busy" @click="submit">
           {{ busy ? '접수 중…' : '접수하기' }}
         </button>
+        <router-link to="/" class="backlink">작성 취소하고 처음으로</router-link>
       </div>
     </div>
   </PubShell>

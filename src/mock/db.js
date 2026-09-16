@@ -170,7 +170,7 @@ function seedComplaints() {
       id: 'M-260913-R7S2T5',
       title: '지하 주차장 조명 어두움',
       content: '주차장 B구역 조명이 어둡습니다.',
-      floor: '1층', space: '주차장', categoryCode: 'ELEC', priority: 'LOW',
+      floor: '지하 1층', space: '주차장', categoryCode: 'ELEC', priority: 'LOW',
       status: 'CANCELED', password: '1010', photos: [],
       assigneeId: null, createdAt: minutesAgo(3200), assignedAt: null, completedAt: null,
       resolution: null, reject: null,

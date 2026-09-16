@@ -1,4 +1,6 @@
 <script setup>
+// 직원 로그인 — 사내 업무 시스템의 로그인 문법을 따른다.
+// 홍보 문구·스플릿 레이아웃 없이: 상단 브랜드 밴드 + 중앙 폼 + 관리자 문의 한 줄.
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { login } from '@/mock/api'
@@ -6,6 +8,7 @@ import { auth } from '@/stores/auth'
 
 const route = useRoute(); const router = useRouter()
 const employeeNo = ref(''); const password = ref(''); const busy = ref(false); const error = ref('')
+const isCapture = new URLSearchParams(location.search).has('capture')
 
 async function submit() {
   if (busy.value) return
@@ -21,48 +24,55 @@ const fill = (no) => { employeeNo.value = no; password.value = '1234' }
 </script>
 
 <template>
-  <div style="min-height: 100dvh; display: grid; grid-template-columns: 1.15fr 1fr">
-    <div style="background: var(--navy); color: #fff; padding: 56px 56px 44px; display: flex; flex-direction: column">
-      <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.16em">FMS</div>
-      <div style="margin-top: auto">
-        <h1 style="font-size: 34px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25">
-          접수부터 완료까지<br />기록으로 남깁니다
-        </h1>
-        <p style="color: var(--on-navy-dim); font-size: 14px; margin-top: 16px; max-width: 380px; line-height: 1.7">
-          판교 오피스 B동 시설관리. 대기 중인 작업을 직접 맡고, 처리 결과를 남기면 다음 정비의 근거가 됩니다.
-        </p>
-      </div>
-      <p style="color: rgba(159,179,208,.6); font-size: 11.5px; margin-top: 40px">관리소장 · 시설기사 전용</p>
-    </div>
+  <div style="min-height: 100dvh; display: flex; flex-direction: column; background: var(--paper)">
+    <header class="pub-top">
+      <span class="wordmark">FMS</span>
+      <span class="bld">판교 오피스 B동 시설관리</span>
+      <span class="grow" />
+      <router-link to="/">신고자 화면으로</router-link>
+    </header>
 
-    <div style="display: flex; align-items: center; padding: 40px">
-      <div style="width: 100%; max-width: 330px; margin: 0 auto">
-        <h2 style="font-size: 20px; font-weight: 700; color: var(--ink)">직원 로그인</h2>
-        <p class="hint" style="margin-top: 5px">사번으로 들어갑니다.</p>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 20px">
+      <div style="width: 100%; max-width: 360px">
+        <div style="background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r); padding: 30px 28px 26px">
+          <h1 style="font-size: 19px; font-weight: 700; color: var(--ink)">직원 로그인</h1>
+          <p class="hint" style="margin-top: 4px">관리소장 · 시설기사 전용</p>
 
-        <div class="field" style="margin-top: 26px">
-          <label class="label">사번</label>
-          <input v-model="employeeNo" class="input mono" placeholder="W001" @keyup.enter="submit" />
+          <div class="field" style="margin-top: 22px">
+            <label class="label">사번</label>
+            <input v-model="employeeNo" class="input mono" placeholder="W001" autocomplete="username" @keyup.enter="submit" />
+          </div>
+          <div class="field">
+            <label class="label">비밀번호</label>
+            <input v-model="password" type="password" class="input" autocomplete="current-password" @keyup.enter="submit" />
+          </div>
+
+          <p v-if="error" class="note warn" style="margin-top: 14px">{{ error }}</p>
+          <button class="btn wide lg" style="margin-top: 18px" :disabled="busy" @click="submit">
+            {{ busy ? '확인 중…' : '로그인' }}
+          </button>
+
+          <p class="hint" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line)">
+            계정·비밀번호 문의 — 관리소장 <span class="mono">02-3456-7800</span>
+          </p>
         </div>
-        <div class="field">
-          <label class="label">비밀번호</label>
-          <input v-model="password" type="password" class="input" @keyup.enter="submit" />
-        </div>
 
-        <p v-if="error" class="note warn" style="margin-top: 14px">{{ error }}</p>
-        <button class="btn wide lg" style="margin-top: 18px" :disabled="busy" @click="submit">
-          {{ busy ? '확인 중…' : '로그인' }}
-        </button>
-
-        <div style="margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--line)">
+        <div v-if="!isCapture" style="margin-top: 14px; padding: 12px 14px; border: 1px dashed var(--line-2); border-radius: var(--r)">
           <p class="hint" style="margin-bottom: 7px">시연 계정 · 비밀번호 1234</p>
           <div class="filters">
-            <button class="ftog" @click="fill('S001')">S001 정영배</button>
-            <button class="ftog" @click="fill('W001')">W001 김도현</button>
-            <button class="ftog" @click="fill('W005')">W005 정민수</button>
+            <button class="ftog" @click="fill('S001')">S001 정영배 · 소장</button>
+            <button class="ftog" @click="fill('W001')">W001 김도현 · 기사</button>
+            <button class="ftog" @click="fill('W005')">W005 정민수 · 기사</button>
           </div>
         </div>
       </div>
     </div>
+
+    <footer style="padding: 14px 32px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); display: flex; gap: 16px">
+      <span>판교 오피스 B동 시설관리</span>
+      <span class="mono">v0.1</span>
+      <span style="flex: 1" />
+      <span>평일 09:00 – 18:00</span>
+    </footer>
   </div>
 </template>

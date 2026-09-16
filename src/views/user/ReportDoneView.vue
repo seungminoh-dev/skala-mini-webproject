@@ -9,7 +9,7 @@ const id = route.params.id
 <template>
   <PubShell narrow>
     <div style="padding: 56px 0 30px">
-      <p class="eyebrow">STEP 2 / 2 · 접수 완료</p>
+      <p class="eyebrow">접수 완료</p>
       <h1 class="display" style="font-size: 30px; margin-top: 10px">접수됐습니다</h1>
       <p class="lede" style="font-size: 14px; margin-top: 8px">담당 기사가 배정되면 상태가 바뀝니다.</p>
     </div>
