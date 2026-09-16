@@ -94,18 +94,6 @@ async function doRelease() {
 
 <template>
   <StaffShell title="민원 상세" :sub="sub">
-    <template #actions>
-      <template v-if="c">
-        <button v-if="canClaim" class="btn" :disabled="busy" @click="onTake">
-          {{ busy ? '처리 중…' : TERMS.claim }}
-        </button>
-        <template v-if="working">
-          <button class="btn line" @click="askRelease = true">{{ TERMS.release }}</button>
-          <button class="btn" @click="router.push({ name: 'worker-complete', params: { id } })">처리 결과 남기기</button>
-        </template>
-      </template>
-    </template>
-
     <div class="page page-narrow">
       <p v-if="loading" class="empty">불러오는 중…</p>
 
@@ -113,24 +101,38 @@ async function doRelease() {
         <router-link :to="backTo" class="backlink">← {{ backLabel }}</router-link>
 
         <div class="whead">
-          <div style="display: flex; align-items: center; gap: 10px; margin-top: 14px">
-            <StatusMark :status="c.status" :late="c.delayed" />
-            <span v-if="c.delayed && c.status === 'RECEIVED'" class="hint">
-              {{ priorityName(c.priority) }} 기준 시간을 넘겼습니다
-            </span>
+          <!-- 행동은 대상이 있는 컨테이너 안, 제목 블록 우측에 둔다 (UX-01 — A-03 과 같은 원칙) -->
+          <div class="whead-row">
+            <div style="min-width: 0">
+              <div style="display: flex; align-items: center; gap: 10px; margin-top: 14px">
+                <StatusMark :status="c.status" :late="c.delayed" />
+                <span v-if="c.delayed && c.status === 'RECEIVED'" class="hint">
+                  {{ priorityName(c.priority) }} 기준 시간을 넘겼습니다
+                </span>
+              </div>
+              <h2 class="wt">{{ c.title }}</h2>
+              <!-- 한 줄 메타. 균등 4칸 흰 박스를 쓰지 않는다 (WX-06) -->
+              <p class="wmeta">
+                <span class="place">{{ c.floor }} {{ c.space }}</span>
+                <span class="sep">·</span><span>{{ categoryName(c.categoryCode) }}</span>
+                <span class="sep">·</span><span :class="{ urgent: c.priority === 'URGENT' }">{{ priorityName(c.priority) }}</span>
+                <span class="sep">·</span><span>{{ c.elapsed }} 접수</span>
+                <template v-if="c.status === 'IN_PROGRESS' && !mine">
+                  <span class="sep">·</span><span>담당 {{ c.assigneeName }} {{ TERMS.worker }}</span>
+                </template>
+                <span class="sep">·</span><span class="mono">{{ c.id }}</span>
+              </p>
+            </div>
+            <div v-if="canClaim || working" class="btn-row" style="flex: none">
+              <button v-if="canClaim" class="btn" :disabled="busy" @click="onTake">
+                {{ busy ? '처리 중…' : TERMS.claim }}
+              </button>
+              <template v-if="working">
+                <button class="btn line" @click="askRelease = true">{{ TERMS.release }}</button>
+                <button class="btn" @click="router.push({ name: 'worker-complete', params: { id } })">처리 결과 남기기</button>
+              </template>
+            </div>
           </div>
-          <h2 class="wt">{{ c.title }}</h2>
-          <!-- 한 줄 메타. 균등 4칸 흰 박스를 쓰지 않는다 (WX-06) -->
-          <p class="wmeta">
-            <span class="place">{{ c.floor }} {{ c.space }}</span>
-            <span class="sep">·</span><span>{{ categoryName(c.categoryCode) }}</span>
-            <span class="sep">·</span><span :class="{ urgent: c.priority === 'URGENT' }">{{ priorityName(c.priority) }}</span>
-            <span class="sep">·</span><span>{{ c.elapsed }} 접수</span>
-            <template v-if="c.status === 'IN_PROGRESS' && !mine">
-              <span class="sep">·</span><span>담당 {{ c.assigneeName }} {{ TERMS.worker }}</span>
-            </template>
-            <span class="sep">·</span><span class="mono">{{ c.id }}</span>
-          </p>
         </div>
 
         <p v-if="error" class="note warn" style="margin-top: 16px">{{ error }}</p>

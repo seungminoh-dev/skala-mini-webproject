@@ -40,7 +40,7 @@ const fill = (no) => { employeeNo.value = no; password.value = '1234' }
 
           <div class="field" style="margin-top: 22px">
             <label class="label">사번</label>
-            <input v-model="employeeNo" class="input mono" placeholder="W001" autocomplete="username" @keyup.enter="submit" />
+            <input v-model="employeeNo" class="input mono" placeholder="예) W001" autocomplete="username" @keyup.enter="submit" />
           </div>
           <div class="field">
             <label class="label">비밀번호</label>

@@ -13,12 +13,12 @@ OUT="docs/img/pc"
 # 긴 폼(U-02, U-07)은 하단 버튼까지 담기게 뷰포트를 늘린다 — 덱·문서는 비율에 맞춰 fit 된다.
 SHOTS=(
   "U-01|/?capture=1"
-  "U-02|/report?capture=1|1180"
+  "U-02|/report?capture=1|1500"
   "U-03|/report/M-260915-G3T7Y4/done?capture=1"
   "U-04|/lookup?capture=1"
   "U-05|/complaints/M-260915-B4N9R2?capture=1"
   "U-06|/complaints/M-260915-B4N9R2?capture=1&modal=pw"
-  "U-07|/complaints/M-260915-B4N9R2/edit?capture=1&modal=edit|1080"
+  "U-07|/complaints/M-260915-B4N9R2/edit?capture=1&modal=edit|1240"
   "W-01|/staff/login?capture=1"
   "E-02|/complaints/M-260915-A7K2Q9?capture=1"
   "E-03|/complaints/M-260915-B4N9R2?capture=1&modal=cancel"
@@ -31,7 +31,7 @@ SHOTS=(
   "E-01|/worker/complaints/M-260915-C9M4T7?capture=1&devrole=WORKER&modal=conflict"
   "E-04|/worker/complaints/M-260915-A7K2Q9/complete?capture=1&devrole=WORKER&modal=release"
   "A-01|/admin?capture=1&devrole=ADMIN|880"
-  "A-02|/admin/complaints?capture=1&devrole=ADMIN|1150"
+  "A-02|/admin/complaints?capture=1&devrole=ADMIN|1155"
   "A-03|/admin/complaints/M-260915-A7K2Q9?capture=1&devrole=ADMIN|860"
   "A-04|/admin/complaints/M-260915-C9M4T7?capture=1&devrole=ADMIN&modal=assign"
   # 배정 회수 확인: /admin/complaints/M-260915-A7K2Q9?devrole=ADMIN&modal=revoke

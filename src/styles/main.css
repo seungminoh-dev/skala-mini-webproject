@@ -322,6 +322,9 @@ h1, h2, h3, p { margin: 0; }
 }
 .ftog:hover { border-color: var(--sky); color: var(--blue); }
 .ftog.on { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 600; }
+/* 성격이 다른 조건 사이를 끊는 선 */
+.filters .fsep { width: 1px; align-self: stretch; background: var(--line-2); margin: 0 4px; flex: none; }
+
 /* 긴급도 선택 — 경고색은 "긴급"이 선택됐을 때 단 하나만 쓴다 */
 .ftog.on.alert { background: var(--alert); border-color: var(--alert); }
 
@@ -586,8 +589,12 @@ h1, h2, h3, p { margin: 0; }
 .head-line a:hover { text-decoration: underline; }
 
 /* 서브타이틀 안의 사실 숫자는 눌러서 대장으로 내려간다 */
-.sub .factlink { color: var(--blue); font-weight: 600; }
-.sub .factlink:hover { text-decoration: underline; }
+.sub .factlink {
+  color: var(--blue); font-weight: 700;
+  text-decoration: underline; text-decoration-style: dotted;
+  text-decoration-color: var(--sky); text-underline-offset: 3px;
+}
+.sub .factlink:hover { text-decoration-style: solid; }
 
 /* 대장 — 조건을 걸어 찾는다. 조건이 무엇인지 항상 보인다 (AX-03, AX-06) */
 .fbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }

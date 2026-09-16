@@ -20,6 +20,12 @@ export function formatDateTime(iso) {
   return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
 }
 
+// 목록·현황판의 "언제 읽은 값인가" 표시. 수동 새로고침이므로 기준 시각을 함께 말한다.
+export function clockLabel(d = new Date()) {
+  const p = (n) => String(n).padStart(2, '0')
+  return `${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
 // 경과 시간을 "전" 없이 길이로만 말한다 — `맡은 지 20분` 처럼 앞말과 이어 쓰는 자리용.
 export function elapsedShort(iso) {
   if (!iso) return '—'

@@ -7,7 +7,7 @@ import StaffShell from '@/components/StaffShell.vue'
 import { getDashboard } from '@/mock/api'
 import { categoryName, priorityName } from '@/mock/constants'
 import { TERMS } from '@/utils/labels'
-import { elapsedShort } from '@/utils/format'
+import { clockLabel, elapsedShort } from '@/utils/format'
 
 const router = useRouter()
 const d = ref(null); const loading = ref(true); const at = ref(null)
@@ -20,11 +20,7 @@ async function load() {
 }
 onMounted(load)
 
-const clock = computed(() => {
-  if (!at.value) return ''
-  const p = (n) => String(n).padStart(2, '0')
-  return `${p(at.value.getHours())}:${p(at.value.getMinutes())}`
-})
+const clock = computed(() => (at.value ? clockLabel(at.value) : ''))
 
 const workerCategories = (w) => (w.categories.length >= 6 ? '전 설비' : w.categories.map(categoryName).join(' · '))
 

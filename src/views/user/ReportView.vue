@@ -160,8 +160,9 @@ const leaveAnyway = () => { const to = leaveTo.value; router.push(to) }
               role="radio" :aria-checked="form.priority === p.code"
               @click="form.priority = p.code">{{ p.name }}</button>
           </div>
-          <p class="hint" style="margin-top: 8px">{{ PRIORITY_DESC[form.priority] }}</p>
-          <div v-if="form.priority === 'URGENT'" class="note warn" style="margin-top: 10px">
+          <!-- 긴급은 경고 박스가 같은 말을 더 강하게 하므로 설명 문장을 겹쳐 두지 않는다 (UX-04) -->
+          <p v-if="form.priority !== 'URGENT'" class="hint" style="margin-top: 8px">{{ PRIORITY_DESC[form.priority] }}</p>
+          <div v-else class="note warn" style="margin-top: 10px">
             안전 위험이나 큰 피해가 우려되면 먼저 긴급 직통
             <a href="tel:0234567899" class="mono" style="font-weight: 700; color: var(--alert)">02-3456-7899</a>로 연락해 주세요.
             온라인 접수는 즉시 출동을 보장하지 않습니다.
