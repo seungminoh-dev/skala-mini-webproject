@@ -52,30 +52,82 @@
   .n-api  { background: #fff; color: var(--navy); border: 0.35mm solid var(--blue); }
   .n-rule { background: var(--ice); color: var(--navy); }
   .n.on-img { position: absolute; top: -2.1mm; left: -2.1mm; box-shadow: 0 0 0 0.75mm var(--bg); z-index: 3; }
+  /* 영역 왼쪽에 여백이 있으면 칩을 바깥으로 빼 화면 글자를 가리지 않게 한다 */
+  .region.chip-out .n.on-img { top: -2mm; left: -5.6mm; }
 
-  .cardrow { display: flex; gap: 3.5mm; margin-top: 9mm; align-items: stretch; }
-  .card { flex: 1; min-width: 0; border-radius: 3px; padding: 3.2mm 3.2mm; }
+  .cardrow { display: flex; gap: 3mm; margin-top: 7mm; align-items: stretch; }
+  .card { flex: 1; min-width: 0; border-radius: 3px; padding: 2.8mm 2.8mm; overflow: hidden; }
   .card.k-api  { background: #fff; border: 0.3mm solid var(--hair); }
   .card.k-ui   { background: rgba(15,40,84,.055); }
   .card.k-rule { background: rgba(189,232,245,.32); }
   .card-head { display: flex; align-items: center; gap: 1.8mm; }
   .kind { font-size: 6.6pt; letter-spacing: .1em; color: var(--sky); font-weight: 700;
           margin: 1.1mm 0 0 5.8mm; }
-  .ct { font-size: 9.6pt; font-weight: 700; color: var(--navy); }
-  .api-line { font-family: var(--mono); font-size: 7.8pt; color: var(--blue); font-weight: 600;
+  .ct { font-size: 9.2pt; font-weight: 700; color: var(--navy); }
+  .api-line { font-family: var(--mono); font-size: 7.2pt; color: var(--blue); font-weight: 600;
               margin: 1mm 0 0 5.8mm; overflow-wrap: anywhere; }
-  .cd { font-size: 9pt; line-height: 1.55; color: #3A4454; margin: 1.3mm 0 0 5.8mm; }
+  .cd { font-size: 8.4pt; line-height: 1.5; color: #3A4454; margin: 1.3mm 0 0 5.8mm; }
+
+
+  /* ── 화면 전이도 ────────────────────────────────────── */
+  .flowmain { display: flex; flex-direction: column; }
+  .fgrid { flex: 1; display: grid; gap: 4mm 15mm; padding: 6mm 2mm 4mm; align-items: center; justify-items: center; align-content: space-evenly; }
+  .fnode { position: relative; width: 100%; max-width: 44mm; background: #fff;
+           border: 0.35mm solid var(--hair); border-radius: 3px; padding: 3mm 3mm 2.6mm; text-align: center; }
+  .fnode.is-hub { border-color: var(--navy); border-width: 0.6mm; }
+  .fnode.is-err { background: rgba(179,64,30,.055); border-color: #E0BDB2; }
+  .fn-id { display: block; font-family: var(--mono); font-size: 8.5pt; font-weight: 700; color: var(--blue); }
+  .fnode.is-err .fn-id { color: var(--warn); }
+  .fn-t { display: block; font-size: 10pt; font-weight: 700; color: var(--navy); margin-top: 1mm; }
+  .fwires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+  .fwires path { fill: none; stroke-width: 1.1; }
+  .fwires path.e-main { stroke: var(--navy); }
+  .fwires path.e-alt  { stroke: var(--sky); stroke-dasharray: 4 3; }
+  .fwires path.e-err  { stroke: var(--warn); stroke-dasharray: 1.5 2.5; }
+  .fwires polygon.a-main { fill: var(--navy); }
+  .fwires polygon.a-alt  { fill: var(--sky); }
+  .fwires polygon.a-err  { fill: var(--warn); }
+  .fwires text { font-family: 'Pretendard','Apple SD Gothic Neo',sans-serif; font-size: 7pt; fill: #5A6474; }
+  .fwires text.t-err { fill: var(--warn); }
+  .fnotes { border-top: 0.3mm solid var(--hair); margin-top: 3mm; padding-top: 2.6mm;
+            display: flex; gap: 6mm; }
+  .fnotes p { flex: 1; font-size: 8.8pt; line-height: 1.55; color: #3A4454; padding-left: 3mm;
+              border-left: 0.3mm solid var(--hair); }
+  .fnotes p:first-child { border-left: 0; padding-left: 0; }
+  .lg { display: inline-block; width: 6mm; height: 0; border-top-width: 0.5mm; margin: 0 1mm 0 2mm; vertical-align: middle; }
+  .lg-main { border-top-style: solid; border-top-color: var(--navy); }
+  .lg-alt  { border-top-style: dashed; border-top-color: var(--sky); }
+  .lg-err  { border-top-style: dotted; border-top-color: var(--warn); }
+
+  /* ── API 커버리지 매트릭스 ──────────────────────────── */
+  .mxmain { display: flex; flex-direction: column; }
+  .mx { width: 100%; border-collapse: collapse; background: #fff; margin-top: 3mm; }
+  .mx th { text-align: left; font-size: 7pt; letter-spacing: .1em; color: #8A93A1; font-weight: 700;
+           padding: 1.6mm 2mm; border-bottom: 0.35mm solid var(--hair); white-space: nowrap; }
+  .mx td { padding: 1.35mm 2mm; border-bottom: 0.25mm solid #EFEBE4; font-size: 8.2pt; vertical-align: middle; }
+  .mx tr.is-gap { background: rgba(179,64,30,.05); }
+  .mx-m { color: var(--blue); font-weight: 700; width: 16mm; }
+  .mx-p { color: var(--ink); width: 74mm; }
+  .mx-op { color: #5A6474; width: 44mm; }
+  .mx-fr { color: #5A6474; width: 34mm; }
+  .sc { display: inline-block; background: rgba(15,40,84,.07); color: var(--navy); font-weight: 700;
+        border-radius: 2px; padding: 0.5mm 1.4mm; margin-right: 1.2mm; font-size: 7.6pt; }
+  .sc-none { color: var(--warn); font-weight: 700; font-size: 8pt; }
+  .mxnotes { display: flex; gap: 4mm; margin-top: 3.5mm; }
+  .mxn { flex: 1; background: rgba(15,40,84,.045); border-radius: 3px; padding: 2.6mm 3mm; }
+  .mxn-t { font-size: 8.6pt; font-weight: 700; color: var(--navy); }
+  .mxn p { font-size: 8pt; line-height: 1.5; color: #3A4454; margin-top: 1.2mm; }
 
   .wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .wires path { fill: none; stroke: var(--sky); stroke-width: 1.1; opacity: .85; }
   .wires circle { fill: var(--sky); }
 
   /* ── footer ── */
-  footer { display: flex; align-items: center; gap: 4mm; border-top: 0.3mm solid var(--hair);
-           margin-top: 3.5mm; padding-top: 2.2mm; font-size: 8pt; color: #3A4454; white-space: nowrap; }
-  .fcell { display: flex; align-items: center; gap: 1.6mm; flex: none; }
-  .fcell:last-child { flex: 1; min-width: 0; }
-  .fcell:last-child .fx { white-space: normal; }
+  footer { display: flex; align-items: flex-start; gap: 3.5mm; border-top: 0.3mm solid var(--hair);
+           margin-top: 3mm; padding-top: 2mm; font-size: 7.8pt; color: #3A4454; }
+  .fcell { display: flex; align-items: baseline; gap: 1.6mm; flex: none; white-space: nowrap; }
+  .fcell:nth-child(2) { flex: 1.6; min-width: 0; white-space: normal; }
+  .fcell:last-child { flex: 1; min-width: 0; white-space: normal; }
   .fcell + .fcell { border-left: 0.3mm solid var(--hair); padding-left: 4mm; }
   .legend { color: #5A6474; }
   .legend .n { margin-left: 2mm; }
@@ -83,9 +135,960 @@
   .flabel { font-size: 7pt; letter-spacing: .12em; color: #8A93A1; font-weight: 700; white-space: nowrap; }
   .fx { color: var(--ink); }
   .mono { font-family: var(--mono); font-size: 7.8pt; }
+  footer .mono { font-size: 7pt; }
   .arr { color: var(--sky); }
   footer b.mono { color: var(--navy); }
 </style></head><body>
+
+  <div class="page" data-id="FLOW-USER">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">흐름</span>
+          <h1>건물 사용자 흐름</h1>
+          <span class="dname">USER 화면 전이도</span>
+          <span class="lead">로그인 없이 시작해 민원 번호 하나로 접수·조회·수정·취소까지 닿는다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-101</span><span class="frchip mono">FR-102</span><span class="frchip mono">FR-103</span><span class="frchip mono">FR-104</span>
+        </div>
+      </header>
+      <main class="flowmain">
+        <div class="fgrid" style="grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr)">
+          
+    <div class="fnode  "
+         data-id="U-01" style="grid-column:1;grid-row:2">
+      <span class="fn-id mono">U-01</span>
+      <span class="fn-t">사용자 홈</span>
+    </div>
+    <div class="fnode  "
+         data-id="U-02" style="grid-column:2;grid-row:1">
+      <span class="fn-id mono">U-02</span>
+      <span class="fn-t">민원 등록</span>
+    </div>
+    <div class="fnode  "
+         data-id="U-04" style="grid-column:2;grid-row:3">
+      <span class="fn-id mono">U-04</span>
+      <span class="fn-t">민원 조회</span>
+    </div>
+    <div class="fnode  "
+         data-id="U-03" style="grid-column:3;grid-row:1">
+      <span class="fn-id mono">U-03</span>
+      <span class="fn-t">접수 완료</span>
+    </div>
+    <div class="fnode  is-hub"
+         data-id="U-05" style="grid-column:3;grid-row:3">
+      <span class="fn-id mono">U-05</span>
+      <span class="fn-t">민원 상세</span>
+    </div>
+    <div class="fnode  "
+         data-id="U-06" style="grid-column:4;grid-row:2">
+      <span class="fn-id mono">U-06</span>
+      <span class="fn-t">본인 확인</span>
+    </div>
+    <div class="fnode  "
+         data-id="U-07" style="grid-column:5;grid-row:1">
+      <span class="fn-id mono">U-07</span>
+      <span class="fn-t">민원 수정</span>
+    </div>
+    <div class="fnode is-err "
+         data-id="E-03" style="grid-column:5;grid-row:3">
+      <span class="fn-id mono">E-03</span>
+      <span class="fn-t">취소 확인</span>
+    </div>
+        </div>
+        <svg class="fwires"></svg>
+        <div class="fnotes">
+          <p>민원 번호가 유일한 열쇠다 — 비밀번호는 수정·취소에서만 쓴다.</p><p>U-05 가 허브다. 접수·조회 어느 쪽에서 오든 여기로 모이고, 변경 행위는 전부 여기서 출발한다.</p><p>배정된 뒤에는 U-05 에서 수정·취소 버튼이 사라진다 (E-02) — 별도 오류 화면을 만들지 않았다.</p>
+        </div>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="lg lg-main"></span> 주 경로
+          <span class="lg lg-alt"></span> 복귀 · 대체
+          <span class="lg lg-err"></span> 예외
+        </div>
+        <div class="fcell"><span class="flabel">읽는 법</span>
+          <span class="fx">화살표 위 글자는 그 이동을 일으키는 조작이다. 굵은 테두리는 여러 경로가 모이는 화면.</span>
+        </div>
+      </footer>
+      <script type="application/json" class="fedges">[{"from":"U-01","to":"U-02","label":"민원 등록하기"},{"from":"U-01","to":"U-04","label":"번호 조회"},{"from":"U-02","to":"U-03","label":"접수","lt":0.5},{"from":"U-03","to":"U-05","label":"처리 상황"},{"from":"U-04","to":"U-05","label":"조회"},{"from":"U-05","to":"U-06","label":"수정 · 취소"},{"from":"U-06","to":"U-07","label":"확인"},{"from":"U-06","to":"E-03","label":"확인","kind":"err"},{"from":"U-07","to":"U-05","label":"저장","kind":"alt","route":"top"},{"from":"E-03","to":"U-05","label":"취소 확정","kind":"alt","route":"bottom"}]</script>
+    </div>
+  </div>
+
+  <div class="page" data-id="FLOW-WORKER">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 시설기사 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">흐름</span>
+          <h1>시설기사 흐름</h1>
+          <span class="dname">WORKER 화면 전이도</span>
+          <span class="lead">고르고 · 현장에 가고 · 결과를 남긴다. 세 동작이 끊기지 않게 배치했다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-201</span><span class="frchip mono">FR-202</span><span class="frchip mono">FR-203</span><span class="frchip mono">FR-204</span><span class="frchip mono">FR-205</span><span class="frchip mono">FR-206</span>
+        </div>
+      </header>
+      <main class="flowmain">
+        <div class="fgrid" style="grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr)">
+          
+    <div class="fnode  "
+         data-id="W-01" style="grid-column:1;grid-row:2">
+      <span class="fn-id mono">W-01</span>
+      <span class="fn-t">직원 로그인</span>
+    </div>
+    <div class="fnode  is-hub"
+         data-id="W-02" style="grid-column:2;grid-row:2">
+      <span class="fn-id mono">W-02</span>
+      <span class="fn-t">미배정 민원</span>
+    </div>
+    <div class="fnode is-err "
+         data-id="E-01" style="grid-column:2;grid-row:3">
+      <span class="fn-id mono">E-01</span>
+      <span class="fn-t">선점 충돌</span>
+    </div>
+    <div class="fnode  is-hub"
+         data-id="W-03" style="grid-column:3;grid-row:2">
+      <span class="fn-id mono">W-03</span>
+      <span class="fn-t">민원 상세</span>
+    </div>
+    <div class="fnode  "
+         data-id="W-04" style="grid-column:3;grid-row:3">
+      <span class="fn-id mono">W-04</span>
+      <span class="fn-t">담당 외 확인</span>
+    </div>
+    <div class="fnode  "
+         data-id="W-05" style="grid-column:4;grid-row:2">
+      <span class="fn-id mono">W-05</span>
+      <span class="fn-t">내 작업</span>
+    </div>
+    <div class="fnode  "
+         data-id="W-06" style="grid-column:5;grid-row:1">
+      <span class="fn-id mono">W-06</span>
+      <span class="fn-t">처리 결과 등록</span>
+    </div>
+    <div class="fnode is-err "
+         data-id="E-04" style="grid-column:5;grid-row:3">
+      <span class="fn-id mono">E-04</span>
+      <span class="fn-t">반납 확인</span>
+    </div>
+        </div>
+        <svg class="fwires"></svg>
+        <div class="fnotes">
+          <p>W-03 은 상태에 따라 세 역할을 한다 — 미배정은 선점 판단, 작업 중은 지시서, 완료는 기록 열람.</p><p>반납은 W-06 과 W-03 두 곳에서 열리지만 도착지는 하나다 — 미배정 목록으로 돌아간다.</p><p>기사 간 직접 이관 경로는 만들지 않았다. 반납 후 재선점, 또는 관리소장 재배정만 존재한다.</p>
+        </div>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="lg lg-main"></span> 주 경로
+          <span class="lg lg-alt"></span> 복귀 · 대체
+          <span class="lg lg-err"></span> 예외
+        </div>
+        <div class="fcell"><span class="flabel">읽는 법</span>
+          <span class="fx">화살표 위 글자는 그 이동을 일으키는 조작이다. 굵은 테두리는 여러 경로가 모이는 화면.</span>
+        </div>
+      </footer>
+      <script type="application/json" class="fedges">[{"from":"W-01","to":"W-02","label":"로그인"},{"from":"W-02","to":"W-03","label":"행 클릭","lt":0.5},{"from":"W-03","to":"W-04","label":"담당 외"},{"from":"W-03","to":"E-01","label":"409","kind":"err"},{"from":"W-03","to":"W-05","label":"맡기","dy":-7,"lt":0.32},{"from":"W-04","to":"W-05","label":"맡기"},{"from":"E-01","to":"W-02","label":"목록으로","kind":"alt"},{"from":"W-05","to":"W-03","label":"지시서","kind":"alt","dy":7,"lt":0.68},{"from":"W-05","to":"W-06","label":"결과 남기기"},{"from":"W-06","to":"E-04","label":"반납","kind":"err"},{"from":"W-06","to":"W-05","label":"작업 완료","kind":"alt","route":"top"},{"from":"E-04","to":"W-02","label":"반납 확정","kind":"alt","route":"bottom"}]</script>
+    </div>
+  </div>
+
+  <div class="page" data-id="FLOW-ADMIN">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">흐름</span>
+          <h1>관리소장 흐름</h1>
+          <span class="dname">ADMIN 화면 전이도</span>
+          <span class="lead">개입 시점을 알아채고 · 근거를 보고 결정하고 · 결정이 이력에 남는다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-301</span><span class="frchip mono">FR-302</span><span class="frchip mono">FR-303</span><span class="frchip mono">FR-304</span><span class="frchip mono">FR-305</span><span class="frchip mono">FR-306</span><span class="frchip mono">FR-307</span><span class="frchip mono">FR-308</span><span class="frchip mono">FR-309</span>
+        </div>
+      </header>
+      <main class="flowmain">
+        <div class="fgrid" style="grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr)">
+          
+    <div class="fnode  "
+         data-id="W-01" style="grid-column:1;grid-row:2">
+      <span class="fn-id mono">W-01</span>
+      <span class="fn-t">직원 로그인</span>
+    </div>
+    <div class="fnode  is-hub"
+         data-id="A-01" style="grid-column:2;grid-row:1">
+      <span class="fn-id mono">A-01</span>
+      <span class="fn-t">운영 현황</span>
+    </div>
+    <div class="fnode  "
+         data-id="A-06" style="grid-column:2;grid-row:3">
+      <span class="fn-id mono">A-06</span>
+      <span class="fn-t">민원 통계</span>
+    </div>
+    <div class="fnode  is-hub"
+         data-id="A-02" style="grid-column:3;grid-row:2">
+      <span class="fn-id mono">A-02</span>
+      <span class="fn-t">전체 민원</span>
+    </div>
+    <div class="fnode  is-hub"
+         data-id="A-03" style="grid-column:4;grid-row:2">
+      <span class="fn-id mono">A-03</span>
+      <span class="fn-t">민원 상세</span>
+    </div>
+    <div class="fnode  "
+         data-id="A-04" style="grid-column:5;grid-row:1">
+      <span class="fn-id mono">A-04</span>
+      <span class="fn-t">배정 · 재배정</span>
+    </div>
+    <div class="fnode  "
+         data-id="A-05" style="grid-column:5;grid-row:3">
+      <span class="fn-id mono">A-05</span>
+      <span class="fn-t">민원 반려</span>
+    </div>
+        </div>
+        <svg class="fwires"></svg>
+        <div class="fnotes">
+          <p>A-01 은 요약이고 정식 조회는 A-02 다 — 지연 조회가 두 곳에 혼재하지 않게 역할을 나눴다.</p><p>배정 회수는 별도 화면이 아니라 A-03 안의 확인 대화상자다. 사유는 선택 입력으로 이력에 남는다.</p><p>A-06 → A-02 → A-03 이 "수치에서 개별 민원까지" 내려가는 경로다. 이력 축적이 정비 근거로 돌아온다.</p>
+        </div>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="lg lg-main"></span> 주 경로
+          <span class="lg lg-alt"></span> 복귀 · 대체
+          <span class="lg lg-err"></span> 예외
+        </div>
+        <div class="fcell"><span class="flabel">읽는 법</span>
+          <span class="fx">화살표 위 글자는 그 이동을 일으키는 조작이다. 굵은 테두리는 여러 경로가 모이는 화면.</span>
+        </div>
+      </footer>
+      <script type="application/json" class="fedges">[{"from":"W-01","to":"A-01","label":"로그인"},{"from":"A-01","to":"A-02","label":"조건 링크"},{"from":"A-01","to":"A-04","label":"행의 배정","lt":0.5},{"from":"A-06","to":"A-02","label":"막대 클릭","kind":"alt"},{"from":"A-02","to":"A-03","label":"행 클릭","lt":0.5},{"from":"A-03","to":"A-04","label":"배정 · 재배정","dy":-6},{"from":"A-03","to":"A-05","label":"반려","dy":-6},{"from":"A-04","to":"A-03","label":"배정 완료","kind":"alt","dy":6},{"from":"A-05","to":"A-03","label":"반려 완료","kind":"alt","dy":6}]</script>
+    </div>
+  </div>
+
+  <div class="page" data-id="W-01">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 공통 <span class="mono">(COMMON)</span></div>
+        <div class="trow">
+          <span class="idchip mono">W-01</span>
+          <h1>직원 로그인</h1>
+          <span class="dname">직원 로그인</span>
+          <span class="lead">ADMIN 과 WORKER 가 공유하는 단 하나의 인증 화면 — 역할에 따라 진입 화면이 갈린다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-001</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/W-01.png" alt="W-01">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:39.5%;top:40.26%;width:21%;height:10.39%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:37.5%;top:23.74%;width:25%;height:62.69%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:39.5%;top:53.06%;width:21%;height:10.39%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:39.5%;top:66.30%;width:21%;height:7.99%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">사번</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">신고자와 달리 직원은 사번으로 식별한다. placeholder 를 `예) W001` 로 두어 실제 값처럼 읽히지 않게 했다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">인증 범위</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">역할 기반 권한 체계는 존재하는 것으로 가정하되, 명세에 Security Schemes 는 기술하지 않는다 (8장).</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">비밀번호</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">직원 계정은 구축 시점에 관리자가 등록한다 — 회원가입 절차를 두지 않는다 (8장 가정).</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">로그인</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /auth/login</div>
+      <p class="cd">역할에 따라 W-02 또는 A-01 로 보낸다. 실패는 `401 LOGIN_FAILED` 하나뿐 — 무엇이 틀렸는지 알려주지 않는다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">(직접 진입)</span> <span class="arr">→</span> <b class="mono">W-01</b>
+          <span class="arr">→</span> <span class="mono fx">W-02 미배정 민원 (WORKER)</span><span class="arr">→</span> <span class="mono fx">A-01 운영 현황 (ADMIN)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">user_account (id, password_hash, role) 조회 — 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-01">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-01</span>
+          <h1>사용자 홈</h1>
+          <span class="dname">신고자 진입점</span>
+          <span class="lead">건물 사용자는 로그인하지 않는다 — 접수와 조회, 두 갈래만 제시한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-101</span><span class="frchip mono">FR-102</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/U-01.png" alt="U-01">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:12.5%;top:46.17%;width:9.8%;height:8.21%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule" data-no="2" style="left:0%;top:0.00%;width:100%;height:8.10%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="3" style="left:12.5%;top:63.46%;width:75%;height:8.21%">
+      <span class="n n-rule on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:55.1%;top:45.40%;width:32.4%;height:7.66%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">민원 등록하기 → U-02</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">접수 누락 방지가 첫 번째 가치이므로, 등록 경로를 가장 큰 조작 단위로 둔다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">비인증 공개 셸</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">USER 는 계정을 만들지 않는다. 상단에 로그인 대신 `직원 로그인` 링크만 두어 두 세계를 분리했다.</p>
+    </div>
+    <div class="card k-rule" data-no="3">
+      <div class="card-head">
+        <span class="n n-rule">3</span>
+        <span class="ct">긴급 직통 안내</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">온라인 접수는 즉시 출동을 보장하지 않는다. 안전 위험은 전화가 정확한 경로라는 사실을 먼저 말한다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">번호로 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints/{id}</div>
+      <p class="cd">민원 번호만으로 상태를 본다. 없는 번호는 `404 COMPLAINT_NOT_FOUND` — 입력칸 아래에 문장으로 돌려준다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">(공개 진입)</span> <span class="arr">→</span> <b class="mono">U-01</b>
+          <span class="arr">→</span> <span class="mono fx">U-02 민원 등록</span><span class="arr">→</span> <span class="mono fx">U-05 민원 상세 (번호 조회)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">조회 시 complaint 단건 select — 이 화면 자체는 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-02">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-02</span>
+          <h1>민원 등록</h1>
+          <span class="dname">민원 접수 폼</span>
+          <span class="lead">접수 누락 방지의 출발점 — 어디가 어떻게 불편한지만 물어 한 페이지로 끝낸다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-101</span>
+          <span class="pochip mono">P-01</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.479%">
+          <img src="../../docs/img/pc/U-02.png" alt="U-02">
+          
+    <div class="region r-ui" data-no="1" style="left:0%;top:0.00%;width:100%;height:8.20%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:28.5%;top:51.76%;width:43.1%;height:11.24%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:28.5%;top:44.26%;width:43.1%;height:36.77%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="4" style="left:28.5%;top:69.79%;width:43.1%;height:7.03%">
+      <span class="n n-rule on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:28.5%;top:86.42%;width:43.1%;height:12.65%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">로그인 없이 접수</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">계정 대신 숫자 4자리 비밀번호를 받는다. 인증 수단이 아니라 수정·취소 때 쓰는 본인 확인 수단이다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">층 · 공간</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">위치는 두 드롭다운으로 받는다. 지하 2층부터 지상 8층까지, 자유 입력을 허용하지 않아 통계가 집계 가능한 형태로 남는다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">민원 등록</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints</div>
+      <p class="cd">여기서 고른 층·공간·설비·긴급도가 그대로 민원의 분류 정보가 된다. 필수 항목이 비면 `400 INVALID_PAYLOAD`.</p>
+    </div>
+    <div class="card k-rule" data-no="4">
+      <div class="card-head">
+        <span class="n n-rule">4</span>
+        <span class="ct">기타 · 모름 허용</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">설비를 모르는 신고자를 위해 남겨 둔다. 오분류는 관리소장이 정정하고(FR-307), 그 전에도 기사가 맡을 수 있다 (P-01).</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">신고 원문</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">제목·내용·사진은 신고자의 진술 기록이다. 관리소장도 이 부분은 수정할 수 없다 (10.4).</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-01 사용자 홈</span> <span class="arr">→</span> <b class="mono">U-02</b>
+          <span class="arr">→</span> <span class="mono fx">U-03 접수 완료</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint INSERT + history(REGISTER) INSERT — 한 트랜잭션</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-03">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-03</span>
+          <h1>접수 완료</h1>
+          <span class="dname">접수증</span>
+          <span class="lead">민원 번호가 이후 조회·수정·취소의 유일한 열쇠 — 보관을 명시적으로 안내한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-101</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/U-03.png" alt="U-03">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:30.5%;top:40.04%;width:39%;height:4.05%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:30.5%;top:44.75%;width:39%;height:3.28%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="3" style="left:30.5%;top:50.88%;width:39%;height:12.80%">
+      <span class="n n-rule on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:28.5%;top:35.78%;width:43.1%;height:32.06%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">접수된 제목</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">방금 접수한 내용을 그대로 되비춰 오등록을 즉시 알아채게 한다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">위치 · 설비 · 접수 시각</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">분류 정보를 한 줄로 확인시킨다. 틀렸으면 이 화면에서 바로 U-05 → 수정으로 갈 수 있다.</p>
+    </div>
+    <div class="card k-rule" data-no="3">
+      <div class="card-head">
+        <span class="n n-rule">3</span>
+        <span class="ct">민원 번호</span>
+      </div>
+      <div class="kind">정책</div>
+      <div class="api-line">M-YYMMDD-XXXXXX</div>
+      <p class="cd">순차 증가값을 쓰지 않는다. 열람이 공개이므로 인접 번호로 타인의 민원이 열리는 것을 막아야 한다 (16.1).</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">접수 응답</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints → 201</div>
+      <p class="cd">생성된 민원의 URI 를 Location 헤더로, 본문은 ComplaintDetail 로 돌려준다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-02 민원 등록</span> <span class="arr">→</span> <b class="mono">U-03</b>
+          <span class="arr">→</span> <span class="mono fx">U-05 민원 상세</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint INSERT 직후의 응답을 그대로 렌더 — 추가 조회 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-04">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-04</span>
+          <h1>민원 조회</h1>
+          <span class="dname">번호 조회</span>
+          <span class="lead">상태 공유의 입구 — 비밀번호 없이 번호만으로 진행 상황을 연다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-102</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/U-04.png" alt="U-04">
+          
+    <div class="region r-ui" data-no="1" style="left:0%;top:0.00%;width:100%;height:8.10%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:28.5%;top:20.90%;width:43.1%;height:5.58%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:28.5%;top:39.61%;width:43.1%;height:8.21%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="4" style="left:28.5%;top:51.31%;width:43.1%;height:6.56%">
+      <span class="n n-rule on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">공개 셸</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">조회는 인증 대상이 아니다. 로그인 화면을 거치지 않고 바로 닿는다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">접수 내역 조회</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">홈에도 같은 입력이 있지만, 링크로 공유받아 들어오는 경로를 위해 독립 화면을 둔다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">번호 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints/{id}</div>
+      <p class="cd">형식이 어긋나면 호출 전에 막고, 없는 번호는 `404` 를 받아 같은 자리에 문장으로 돌려준다.</p>
+    </div>
+    <div class="card k-rule" data-no="4">
+      <div class="card-head">
+        <span class="n n-rule">4</span>
+        <span class="ct">열람은 공개</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">비밀번호는 조회에 쓰지 않는다. 수정·취소에서만 본인 확인 수단으로 쓴다 — 그래서 번호가 비순차여야 한다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-01 사용자 홈</span> <span class="arr">→</span> <b class="mono">U-04</b>
+          <span class="arr">→</span> <span class="mono fx">U-05 민원 상세</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint 단건 select (pk) — 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-05">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-05</span>
+          <h1>민원 상세</h1>
+          <span class="dname">처리 상황</span>
+          <span class="lead">상태 공유의 본체 — 지금 어디까지 왔는지를 문장으로 먼저 말한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-102</span><span class="frchip mono">FR-103</span><span class="frchip mono">FR-104</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/U-05.png" alt="U-05">
+          
+    <div class="region r-api chip-out" data-no="1" style="left:12.5%;top:56.02%;width:43.2%;height:4.05%">
+      <span class="n n-api on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:12.5%;top:20.68%;width:61.4%;height:5.36%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:12.5%;top:38.62%;width:75%;height:3.28%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="4" style="left:58.7%;top:61.93%;width:28.8%;height:5.91%">
+      <span class="n n-rule on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:75.3%;top:41.90%;width:12.2%;height:6.35%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-api" data-no="1">
+      <div class="card-head">
+        <span class="n n-api">1</span>
+        <span class="ct">상세 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints/{id}</div>
+      <p class="cd">완료된 건은 조치 결과가 등록한 내용보다 먼저 온다 — 신고자가 가장 알고 싶은 것이 결과이기 때문이다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">상태를 문장으로</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">상태명과 설명을 두 줄로 나눠 말한다. `RECEIVED` 같은 코드값은 화면에 쓰지 않는다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">번호 · 복사</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">민원 번호와 조회 링크를 복사할 수 있다. 번호를 잃으면 접근 경로가 사라지기 때문이다.</p>
+    </div>
+    <div class="card k-rule" data-no="4">
+      <div class="card-head">
+        <span class="n n-rule">4</span>
+        <span class="ct">처리 이력</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">이력의 내부 note(`담당 외 설비` 등)는 신고자에게 보이지 않는다. 운영 정보와 신고자에게 줄 정보를 나눈다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">민원 수정 · 취소</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">`RECEIVED` 일 때만 나타난다. 담당 기사가 배정되면 이 두 버튼이 사라진다 (E-02).</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-03 접수 완료 · U-04 민원 조회</span> <span class="arr">→</span> <b class="mono">U-05</b>
+          <span class="arr">→</span> <span class="mono fx">U-06 본인 확인 (수정·취소)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint + history 조인 조회 — 타임라인이 이력을 그대로 렌더</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-06">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-06</span>
+          <h1>수정·취소 본인 확인</h1>
+          <span class="dname">비밀번호 확인</span>
+          <span class="lead">열람과 변경 사이의 유일한 관문 — 접수 때 정한 숫자 4자리를 확인한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-103</span><span class="frchip mono">FR-104</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/U-06.png" alt="U-06">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:34.8%;top:37.64%;width:30.4%;height:11.38%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:34.7%;top:37.42%;width:30.6%;height:34.57%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:36.3%;top:51.86%;width:27.4%;height:7.66%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:34.8%;top:62.25%;width:30.4%;height:9.52%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">무엇을 하려는지 먼저</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">제목이 수정용인지 취소용인지를 말한다. 같은 대화상자를 두 행위가 공유하기 때문이다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">두 가지 실패</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">`401 PASSWORD_MISMATCH` 는 입력칸 아래에, `409 NOT_EDITABLE` 은 대화상자를 닫고 상세에 안내한다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">숫자 4자리</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">4자리를 채우기 전에는 확인 버튼이 눌리지 않는다. 오타로 실패 횟수를 쌓지 않게 한다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">본인 확인</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/password-verification</div>
+      <p class="cd">통과하면 수정 화면 또는 취소 확인으로 넘어간다. 확인만 하고 상태는 바꾸지 않는다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-05 민원 상세</span> <span class="arr">→</span> <b class="mono">U-06</b>
+          <span class="arr">→</span> <span class="mono fx">U-07 민원 수정</span><span class="arr">→</span> <span class="mono fx">E-03 민원 취소 확인</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">password_hash 비교만 — 상태 전이 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="U-07">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 건물 사용자 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">U-07</span>
+          <h1>민원 수정</h1>
+          <span class="dname">신고 원문 수정</span>
+          <span class="lead">신고자만 원문을 고칠 수 있고, 고칠 수 있는 시점은 배정 전까지다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-103</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.433%">
+          <img src="../../docs/img/pc/U-07.png" alt="U-07">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:28.5%;top:50.78%;width:21.2%;height:6.98%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui" data-no="2" style="left:0%;top:0.00%;width:100%;height:8.14%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:28.5%;top:39.15%;width:43.1%;height:32.56%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:28.5%;top:64.73%;width:43.1%;height:6.98%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="5" style="left:28.5%;top:76.94%;width:43.1%;height:15.50%">
+      <span class="n n-rule on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">층</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">위치를 잘못 골랐다면 여기서 고친다. 같은 값을 관리소장도 FR-307 로 고칠 수 있지만 경로와 권한이 다르다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">같은 공개 셸</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">수정도 로그인 없이 이뤄진다. 직전 화면에서 확인한 비밀번호를 세션에 들고 온다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">원문 수정</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">PATCH /complaints/{id}</div>
+      <p class="cd">전달한 필드만 수정된다. 비밀번호는 본인 확인용이며 변경 대상이 아니다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">설비</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">`기타·모름`으로 접수했더라도 나중에 알게 되면 신고자가 직접 바로잡을 수 있다.</p>
+    </div>
+    <div class="card k-rule" data-no="5">
+      <div class="card-head">
+        <span class="n n-rule">5</span>
+        <span class="ct">배정 전까지만</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">저장 시점에 이미 배정됐다면 `409 NOT_EDITABLE`. 기사가 본 지시와 기록이 어긋나지 않게 한다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-06 본인 확인</span> <span class="arr">→</span> <b class="mono">U-07</b>
+          <span class="arr">→</span> <span class="mono fx">U-05 민원 상세 (저장 후)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE + history(UPDATE) — 상태는 RECEIVED 그대로</span></div>
+      </footer>
+    </div>
+  </div>
 
   <div class="page" data-id="W-02">
     <div class="rail"></div>
@@ -94,32 +1097,32 @@
         <div class="kicker">프로젝트 기술서 · UI 흐름 — 시설기사 <span class="mono">(WORKER)</span></div>
         <div class="trow">
           <span class="idchip mono">W-02</span>
-          <h1>대기 중인 작업</h1>
+          <h1>미배정 민원</h1>
           <span class="dname">미배정 민원 목록</span>
-          <span class="lead">선점(Pull) 방식의 출발점 — 접수된 요청이 곧바로 노출되고, 기사가 직접 골라 가져간다.</span>
+          <span class="lead">선점(Pull) 방식의 출발점 — 접수된 민원이 곧바로 노출되고, 기사가 직접 골라 가져간다.</span>
           <span class="spacer"></span>
           <span class="frchip mono">FR-201</span>
           <span class="pochip mono">P-01</span><span class="pochip mono">P-02</span>
         </div>
       </header>
       <main>
-        <div class="shot" style="padding-top:34.028%">
+        <div class="shot" style="padding-top:44.461%">
           <img src="../../docs/img/pc/W-02.png" alt="W-02">
           
-    <div class="region r-ui" data-no="1" style="left:0.7%;top:33.71%;width:14.9%;height:7.71%">
+    <div class="region r-ui" data-no="1" style="left:0%;top:25.83%;width:15.6%;height:6.13%">
       <span class="n n-ui on-img">1</span>
     </div>
-    <div class="region r-rule" data-no="2" style="left:17.7%;top:42.00%;width:12.2%;height:9.71%">
+    <div class="region r-rule chip-out" data-no="2" style="left:17.6%;top:31.62%;width:9.2%;height:9.77%">
       <span class="n n-rule on-img">2</span>
     </div>
-    <div class="region r-ui" data-no="3" style="left:17.4%;top:20.43%;width:33.9%;height:7.29%">
+    <div class="region r-ui chip-out" data-no="3" style="left:17.5%;top:15.89%;width:44%;height:4.97%">
       <span class="n n-ui on-img">3</span>
     </div>
-    <div class="region r-ui" data-no="4" style="left:17.5%;top:54.14%;width:80.6%;height:12.86%">
-      <span class="n n-ui on-img">4</span>
+    <div class="region r-api chip-out" data-no="4" style="left:17.5%;top:25.99%;width:80.6%;height:72.85%">
+      <span class="n n-api on-img">4</span>
     </div>
-    <div class="region r-api" data-no="5" style="left:17.5%;top:34.57%;width:80.6%;height:58.00%">
-      <span class="n n-api on-img">5</span>
+    <div class="region r-ui chip-out" data-no="5" style="left:81.3%;top:15.89%;width:16.7%;height:4.97%">
+      <span class="n n-ui on-img">5</span>
     </div>
         </div>
         <div class="cardrow">
@@ -130,43 +1133,43 @@
       </div>
       <div class="kind">동작 · 이동</div>
       <div class="api-line">GET /complaints?assignee=me</div>
-      <p class="cd">내가 맡아 진행 중인 작업만 분리해 본다. 같은 목록 API 를 질의 조건만 바꿔 재사용한다.</p>
+      <p class="cd">내가 맡아 진행 중인 민원만 분리해 본다. 같은 목록 API 를 질의 조건만 바꿔 재사용한다.</p>
     </div>
     <div class="card k-rule" data-no="2">
       <div class="card-head">
         <span class="n n-rule">2</span>
-        <span class="ct">지연 표시</span>
+        <span class="ct">긴급도와 지연</span>
       </div>
       <div class="kind">정책</div>
       
-      <p class="cd">긴급 1시간 · 보통 6시간 · 낮음 24시간 초과 시 서버가 판정한다 (P-02). 관리소장 개입의 기준.</p>
+      <p class="cd">긴급 1시간 · 보통 6시간 · 낮음 24시간을 넘기면 서버가 지연으로 판정한다 (P-02). 관리소장 개입의 기준이다.</p>
     </div>
     <div class="card k-ui" data-no="3">
       <div class="card-head">
         <span class="n n-ui">3</span>
-        <span class="ct">설비 필터</span>
+        <span class="ct">내 담당 · 설비 필터</span>
       </div>
       <div class="kind">동작 · 이동</div>
       
-      <p class="cd">내 담당 설비 탭에 · 표식. 담당 외 요청도 열람·선점할 수 있다 — 오분류 방치를 막는 정책 (P-01).</p>
+      <p class="cd">내 담당을 첫 자리에 두되 기본은 전체다. 담당 외 민원도 맡을 수 있어 오분류 건이 방치되지 않는다 (P-01).</p>
     </div>
-    <div class="card k-ui" data-no="4">
+    <div class="card k-api" data-no="4">
       <div class="card-head">
-        <span class="n n-ui">4</span>
-        <span class="ct">행 클릭 → W-03 상세</span>
-      </div>
-      <div class="kind">동작 · 이동</div>
-      
-      <p class="cd">선점은 신고 내용을 확인한 뒤 상세 화면에서만 시작된다. 목록에 "맡기" 버튼을 두지 않았다.</p>
-    </div>
-    <div class="card k-api" data-no="5">
-      <div class="card-head">
-        <span class="n n-api">5</span>
-        <span class="ct">대기 목록 조회</span>
+        <span class="n n-api">4</span>
+        <span class="ct">미배정 목록 조회</span>
       </div>
       <div class="kind">연결 API</div>
       <div class="api-line">GET /complaints?status=RECEIVED</div>
-      <p class="cd">긴급도 → 오래 기다린 순 정렬. 맨 위가 항상 지금 가장 먼저 처리해야 할 건이다.</p>
+      <p class="cd">긴급도 → 오래 기다린 순이 기본 정렬이다. 맨 위가 지금 가장 먼저 처리해야 할 민원이다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">정렬 선택</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">긴급한 순 · 오래된 순 · 위치 순을 기사가 고른다. 표시 계층에서만 바꾸고 API 정렬은 그대로다.</p>
     </div></div>
         <svg class="wires"></svg>
       </main>
@@ -178,17 +1181,1557 @@
         </div>
         <div class="fcell"><span class="flabel">화면 연결</span>
           <span class="mono fx">W-01 직원 로그인</span> <span class="arr">→</span> <b class="mono">W-02</b>
-          <span class="arr">→</span> <span class="mono fx">W-03 요청 상세 (행 클릭)</span><span class="arr">→</span> <span class="mono fx">W-05 내 작업 (좌측 레일)</span>
+          <span class="arr">→</span> <span class="mono fx">W-03 민원 상세 (행 클릭)</span><span class="arr">→</span> <span class="mono fx">W-05 내 작업 (좌측 레일)</span>
         </div>
-        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">idx_complaint_unassigned (status, priority, created_at) 로 정렬 조회 — 쓰기 없음</span></div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">idx_complaint_unassigned 로 정렬 조회 — 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="W-03">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 시설기사 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">W-03</span>
+          <h1>민원 상세</h1>
+          <span class="dname">민원 상세 (선점 · 작업 중 · 완료 열람)</span>
+          <span class="lead">맡기 전에는 판단 근거, 맡은 뒤에는 작업 지시서, 끝난 뒤에는 기록 — 한 화면이 상태에 따라 역할을 바꾼다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-202</span><span class="frchip mono">FR-206</span>
+          <span class="pochip mono">P-01</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/W-03.png" alt="W-03">
+          
+    <div class="region r-api chip-out" data-no="1" style="left:17.5%;top:76.26%;width:29.2%;height:11.71%">
+      <span class="n n-api on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:17.5%;top:35.23%;width:64.3%;height:3.50%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="3" style="left:17.5%;top:44.53%;width:72.5%;height:7.22%">
+      <span class="n n-rule on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:67.8%;top:61.71%;width:22.2%;height:5.91%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:83.1%;top:32.28%;width:6.9%;height:6.35%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-api" data-no="1">
+      <div class="card-head">
+        <span class="n n-api">1</span>
+        <span class="ct">첨부 사진</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints/{id}</div>
+      <p class="cd">현장에 가기 전에 무엇을 보는지 확인한다. 없으면 `첨부 사진 없음` 한 줄 — 없다는 것도 정보다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">한 줄 메타</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">위치를 굵게 앞에 두고 설비·긴급도·경과·번호를 한 줄로 잇는다. 균등 분할 박스를 쓰지 않는다.</p>
+    </div>
+    <div class="card k-rule" data-no="3">
+      <div class="card-head">
+        <span class="n n-rule">3</span>
+        <span class="ct">담당 외 설비</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">담당 기사를 사실로 알려줄 뿐 막지 않는다. 오분류된 민원이 정정 전까지 방치되는 것을 막기 위한 정책이다 (P-01).</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">처리 이력</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">누가 언제 무엇을 했는지가 이 테이블 하나에 쌓인다. 기사 화면에서는 내부 note 까지 보여 준다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">이 작업 맡기</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      <div class="api-line">POST /complaints/{id}/claim</div>
+      <p class="cd">상태별로 행동이 바뀐다 — 미배정은 맡기, 작업 중(본인)은 결과 남기기·반납, 완료는 행동 없음.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-02 미배정 민원 · W-05 내 작업</span> <span class="arr">→</span> <b class="mono">W-03</b>
+          <span class="arr">→</span> <span class="mono fx">W-04 담당 외 확인</span><span class="arr">→</span> <span class="mono fx">W-05 내 작업 (맡기 후)</span><span class="arr">→</span> <span class="mono fx">W-06 처리 결과 등록</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint + history + 동일 위치 진행 중 민원 조회 — 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="W-04">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 시설기사 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">W-04</span>
+          <h1>담당 외 설비 경고</h1>
+          <span class="dname">담당 외 선점 확인</span>
+          <span class="lead">막는 장치가 아니라 확인 장치 — 담당 외 선점을 허용하되 흔적을 남긴다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-202</span>
+          <span class="pochip mono">P-01</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/W-04.png" alt="W-04">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:34.8%;top:44.20%;width:30.4%;height:11.38%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:34.7%;top:44.09%;width:30.6%;height:21.23%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:34.8%;top:55.69%;width:30.4%;height:9.52%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:83.1%;top:32.28%;width:6.9%;height:6.35%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">결과만 말한다</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">상세 화면이 이미 담당 기사를 알려줬으므로 같은 문장을 되풀이하지 않는다. 맡으면 무슨 일이 일어나는지만 말한다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">P-01 선점 자격</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">작업자는 카테고리와 무관하게 모든 미배정 민원을 선점할 수 있다. 경고는 진행 여부를 확인하는 단계일 뿐이다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">맡기</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/claim</div>
+      <p class="cd">담당 외 여부는 서버가 판단해 이력 note 에 `담당 외 설비` 로 남긴다. 화면이 보내는 값이 아니다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">여기서 열린다</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">담당 설비가 일치하면 이 대화상자 없이 곧바로 선점된다 — 확인은 예외 경로에만 붙는다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-03 민원 상세</span> <span class="arr">→</span> <b class="mono">W-04</b>
+          <span class="arr">→</span> <span class="mono fx">W-05 내 작업 (맡기)</span><span class="arr">→</span> <span class="mono fx">W-03 민원 상세 (돌아가기)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint_history(CLAIM, note=담당 외 설비) INSERT</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="W-05">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 시설기사 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">W-05</span>
+          <h1>내 작업</h1>
+          <span class="dname">내 작업 목록</span>
+          <span class="lead">내가 맡은 것과 끝낸 것 — 끝낸 것도 다시 열어볼 수 있어야 이력이 쓸모를 갖는다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-204</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/W-05.png" alt="W-05">
+          
+    <div class="region r-ui" data-no="1" style="left:0%;top:25.82%;width:15.6%;height:6.13%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:17.5%;top:15.97%;width:7.7%;height:4.92%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:17.6%;top:31.73%;width:80.4%;height:9.96%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:78%;top:26.15%;width:8.5%;height:5.58%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:86.5%;top:26.15%;width:9.2%;height:5.58%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">레일 메뉴</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">기사의 업무는 두 가지뿐이다 — 고르기(미배정 민원)와 처리하기(내 작업). 메뉴도 둘로 끝낸다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">작업 중 / 완료 탭</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">탭에 따라 열 구성이 달라진다. 작업 중은 맡은 지, 완료는 완료 시각과 조치 요약을 보여 준다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">내 작업 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints?assignee=me&amp;status=IN_PROGRESS</div>
+      <p class="cd">목록 엔드포인트 하나가 네 화면을 담당한다 — 질의 조건만 다르다 (15.2).</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">맡은 지</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">assigned_at 기준 경과. 오래 붙잡고 있는 건이 위로 오도록 작업 중 탭만 정렬을 뒤집는다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">결과 남기기 → W-06</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">행 클릭은 상세(지시서)로, 버튼은 결과 입력으로 간다. 읽는 동선과 쓰는 동선을 분리했다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-02 미배정 민원 · W-03 맡기 직후</span> <span class="arr">→</span> <b class="mono">W-05</b>
+          <span class="arr">→</span> <span class="mono fx">W-03 민원 상세 (행 클릭)</span><span class="arr">→</span> <span class="mono fx">W-06 처리 결과 등록</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">idx_complaint_assignee (assignee_id, status) 로 조회 — 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="W-06">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 시설기사 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">W-06</span>
+          <h1>처리 결과 등록</h1>
+          <span class="dname">작업 일지</span>
+          <span class="lead">이력 축적의 실질 — 바쁜 현장에서 몇 초 안에 끝나면서도 내용이 남아야 한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-203</span><span class="frchip mono">FR-205</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/W-06.png" alt="W-06">
+          
+    <div class="region r-rule chip-out" data-no="1" style="left:17.5%;top:25.82%;width:47.2%;height:6.35%">
+      <span class="n n-rule on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:17.5%;top:38.51%;width:47.2%;height:11.27%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:17.5%;top:53.28%;width:47.2%;height:10.18%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:17.5%;top:67.83%;width:47.2%;height:9.41%">
+      <span class="n n-api on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:67.8%;top:18.05%;width:22.2%;height:16.08%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-rule" data-no="1">
+      <div class="card-head">
+        <span class="n n-rule">1</span>
+        <span class="ct">정형 조치 선택지</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">자유 서술만 요구하면 현장에서는 "찍고 넘기기"가 된다. 탭 한 번으로 필수를 채우되 내용은 남는 절충이다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">메모 (선택)</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">저장할 때 `선택지 — 메모` 로 합쳐 `resolution_content` 한 필드에 넣는다. ERD·API 는 바뀌지 않는다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">조치 사진 (선택)</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">개별 제거가 가능하다. 프로토타입은 파일명만 저장하고, 실제 구현은 사전 업로드된 URL 을 받는다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">작업 완료</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/completion</div>
+      <p class="cd">처리 시간은 입력받지 않고 접수 → 완료 간격으로 산출한다. 조치 내용이 비면 `400 RESOLUTION_REQUIRED`.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">원문 병기</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">신고 내용·위치·사진·이력을 보조 열에 함께 둔다. 결과를 쓰려고 화면을 나갈 필요가 없다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-05 내 작업 · W-03 민원 상세</span> <span class="arr">→</span> <b class="mono">W-06</b>
+          <span class="arr">→</span> <span class="mono fx">W-05 내 작업 (완료)</span><span class="arr">→</span> <span class="mono fx">E-04 반납 확인</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE(조치 결과 · 완료 시각) + history(COMPLETE)</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="A-01">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">A-01</span>
+          <h1>운영 현황</h1>
+          <span class="dname">현황판</span>
+          <span class="lead">개입이 필요한 것과 지금 누가 무엇을 하는지 — 스크롤 없이 한 화면에서 판단한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-301</span><span class="frchip mono">FR-302</span><span class="frchip mono">FR-303</span>
+          <span class="pochip mono">P-02</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.428%">
+          <img src="../../docs/img/pc/A-01.png" alt="A-01">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:17.5%;top:8.67%;width:19.2%;height:3.03%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:17.5%;top:17.74%;width:80.6%;height:5.09%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:17.5%;top:24.76%;width:80.6%;height:30.26%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:17.5%;top:66.99%;width:80.6%;height:30.26%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:82.6%;top:24.90%;width:9.2%;height:9.90%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">사실 문장 + 조건 링크</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">균등한 수치 타일 네 개를 없앴다. 미배정·작업 중·오늘 완료는 문장 안의 숫자이고, 누르면 그 조건의 A-02 가 열린다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">지연 민원</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">한 화면의 큰 숫자는 하나뿐 — 개입 기준인 지연 건수다 (P-02). 나머지 지표는 위계를 낮췄다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">현황 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /dashboard</div>
+      <p class="cd">한 화면을 한 번의 호출로 채운다. 정식 지연 조회는 A-02 의 `지연만` 조건이 담당하고 여기는 상위 6건 요약이다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">기사 현황</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      <div class="api-line">workers[].current[]</div>
+      <p class="cd">보유 건수만으로는 누가 무엇을 하는지 알 수 없다. 현재 맡은 민원·위치·맡은 지를 함께 주고 활동 중인 기사를 위에 둔다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">인라인 배정</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">행에서 바로 배정 대화상자를 연다. 개입 동선을 상세 화면 경유에서 한 단계 줄였다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-01 직원 로그인</span> <span class="arr">→</span> <b class="mono">A-01</b>
+          <span class="arr">→</span> <span class="mono fx">A-02 전체 민원 (조건 링크)</span><span class="arr">→</span> <span class="mono fx">A-03 민원 상세 (행 클릭)</span><span class="arr">→</span> <span class="mono fx">A-04 배정 (행의 배정)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">상태별 count + 지연 목록 + 작업자별 보유·현재 작업을 한 번의 호출로 구성</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="A-02">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">A-02</span>
+          <h1>전체 민원</h1>
+          <span class="dname">민원 대장</span>
+          <span class="lead">조건을 걸어 찾는 대장 — 무엇이 걸려 있는지 화면이 항상 먼저 말한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-301</span><span class="frchip mono">FR-302</span>
+          <span class="pochip mono">P-02</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.435%">
+          <img src="../../docs/img/pc/A-02.png" alt="A-02">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:17.5%;top:15.88%;width:19.8%;height:6.50%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:38.3%;top:16.79%;width:29.1%;height:4.87%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:17.5%;top:23.65%;width:79.5%;height:4.87%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:15.6%;top:30.32%;width:83.4%;height:7.76%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-api chip-out" data-no="5" style="left:15.6%;top:38.09%;width:83.4%;height:56.14%">
+      <span class="n n-api on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">검색</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">제목 또는 민원 번호 부분 일치. 버튼과 Enter 둘 다 동작하고, 검색어도 조건 요약에 함께 나열된다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">상태 · 지연만</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">지연은 상태가 아니라 경과 조건이다. 같은 줄에 두되 세그먼트와 스위치로 층위를 나눴다 (P-02).</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">설비 · 층 · 긴급도 · 기간</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">FR-301 이 요구하는 조건을 모두 제공한다. 기간은 접수 시각 기준이며 명세에 `from`·`to` 를 추가했다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">조건 요약 · 정렬</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">걸린 조건을 사실로 나열하고 `필터 해제`가 검색어까지 지운다. 모든 조건은 URL 쿼리와 동기화되어 새로고침에도 살아 있다.</p>
+    </div>
+    <div class="card k-api" data-no="5">
+      <div class="card-head">
+        <span class="n n-api">5</span>
+        <span class="ct">전체 민원 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints</div>
+      <p class="cd">열 순서는 상태 → 긴급도 → 위치 → 요청 내용 → 설비 → 담당 기사 → 접수. 관리자는 전 상태를 보므로 상태 열을 유지한다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">A-01 운영 현황 · A-06 통계 (막대 클릭)</span> <span class="arr">→</span> <b class="mono">A-02</b>
+          <span class="arr">→</span> <span class="mono fx">A-03 민원 상세 (행 클릭)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">상태·설비·층·긴급도·담당자·기간·지연·검색어 조합 조회 — 쓰기 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="A-03">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">A-03</span>
+          <h1>민원 상세 (관리)</h1>
+          <span class="dname">결정 화면</span>
+          <span class="lead">상태에 따라 할 수 있는 행동만 보이고, 결정에 필요한 근거가 옆에 있다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-304</span><span class="frchip mono">FR-305</span><span class="frchip mono">FR-306</span><span class="frchip mono">FR-307</span>
+          <span class="pochip mono">D-01</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.433%">
+          <img src="../../docs/img/pc/A-03.png" alt="A-03">
+          
+    <div class="region r-api chip-out" data-no="1" style="left:17.5%;top:80.38%;width:47.2%;height:10.08%">
+      <span class="n n-api on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:17.5%;top:95.83%;width:47.2%;height:4.03%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:17.5%;top:33.33%;width:55.4%;height:3.49%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:67.8%;top:74.19%;width:22.2%;height:12.50%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:74.3%;top:30.51%;width:15.7%;height:6.45%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-api" data-no="1">
+      <div class="card-head">
+        <span class="n n-api">1</span>
+        <span class="ct">같은 위치 민원</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints/{id}/related</div>
+      <p class="cd">중복 판단의 근거다. 등록 시 자동 탐지는 하지 않고 사후 반려 + 원본 연결로 처리한다 (D-01).</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">분류 정보 수정</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      <div class="api-line">PATCH /complaints/{id}/classification</div>
+      <p class="cd">상태와 무관하게 가능하지만 보조 행동이므로 접어 둔다. 신고 원문은 대상이 아니고, 이력에는 바뀐 항목을 한글 라벨로 남긴다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">한 줄 메타</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">위치·설비·긴급도·경과·담당·번호를 한 줄로. USER·WORKER 상세와 같은 위계 규칙을 쓴다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">담당 기사</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">담당 설비·보유 건수·맡은 지를 함께 둔다. 회수나 재배정이 맞는 판단인지 여기서 가늠한다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">상태별 행동</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">미배정은 배정·반려, 작업 중은 재배정·회수·반려, 완료와 반려는 행동이 없다. 버튼은 뷰포트가 아니라 제목 블록 우측에 둔다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">A-01 운영 현황 · A-02 전체 민원</span> <span class="arr">→</span> <b class="mono">A-03</b>
+          <span class="arr">→</span> <span class="mono fx">A-04 배정 · 재배정</span><span class="arr">→</span> <span class="mono fx">A-05 민원 반려</span><span class="arr">→</span> <span class="mono fx">배정 회수 확인 (대화상자)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE(담당 또는 분류) + complaint_history INSERT</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="A-04">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">A-04</span>
+          <h1>배정 · 재배정</h1>
+          <span class="dname">담당 기사 선택</span>
+          <span class="lead">선점이 기본이고 배정은 예외 경로 — 그 예외가 성립하려면 고를 근거가 화면에 있어야 한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-304</span><span class="frchip mono">FR-305</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/A-04.png" alt="A-04">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:34.8%;top:14.66%;width:30.4%;height:11.38%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:36.4%;top:29.10%;width:27.2%;height:9.74%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:36.3%;top:28.88%;width:27.4%;height:49.12%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:34.8%;top:85.23%;width:30.4%;height:9.52%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">제목이 갈린다</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">미배정이면 `담당 기사 배정`, 작업 중이면 `담당 기사 재배정`. 같은 엔드포인트지만 관리소장이 하는 일은 다르다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">설비 일치 표식</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">이 민원의 설비를 담당하는 기사에 `●` 를 붙인다. 선점과 달리 배정에는 카테고리 제약이 없지만, 기본 선택지는 담당자여야 한다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">정렬 기준</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      <div class="api-line">GET /workers</div>
+      <p class="cd">설비 일치 → 보유 적은 순 → 이름순. 재배정이면 현재 담당은 `현재 담당` 으로 표시하고 선택할 수 없다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">배정</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/assignment</div>
+      <p class="cd">배정할 수 없는 상태면 `409` 를 대화상자 안에 문장으로 돌려주고, 닫을 때 상세를 다시 읽는다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">A-01 운영 현황 · A-03 민원 상세</span> <span class="arr">→</span> <b class="mono">A-04</b>
+          <span class="arr">→</span> <span class="mono fx">A-03 민원 상세 (배정 후)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE(담당 · 배정 시각) + history(ASSIGN|REASSIGN)</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="A-05">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">A-05</span>
+          <h1>민원 반려</h1>
+          <span class="dname">반려 사유 등록</span>
+          <span class="lead">처리하지 않기로 한 이유가 신고자에게 그대로 간다 — 그래서 근거를 옆에 두고 쓴다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-308</span>
+          <span class="pochip mono">D-01</span>
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.417%">
+          <img src="../../docs/img/pc/A-05.png" alt="A-05">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:17.5%;top:24.23%;width:22.2%;height:48.97%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:42.8%;top:28.08%;width:47.2%;height:4.87%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:42.8%;top:39.23%;width:47.2%;height:17.18%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="4" style="left:42.8%;top:67.82%;width:47.2%;height:10.13%">
+      <span class="n n-rule on-img">4</span>
+    </div>
+    <div class="region r-api chip-out" data-no="5" style="left:42.8%;top:95.13%;width:47.2%;height:4.87%">
+      <span class="n n-api on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">판단 근거</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">신고 원문·첨부 사진·같은 위치에서 진행 중인 민원을 왼쪽에 둔다. 제목과 번호만으로는 중복인지 알 수 없다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">반려 사유</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">중복 민원 · 관리 대상 외 · 내용 확인 불가 세 가지. 라벨은 질문형이 아니라 용어형으로 쓴다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">신고자에게 보일 설명</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">이 문장이 U-05 의 반려 사유 섹션에 그대로 노출된다. 비어 있으면 항목 아래 오류를 띄운다.</p>
+    </div>
+    <div class="card k-rule" data-no="4">
+      <div class="card-head">
+        <span class="n n-rule">4</span>
+        <span class="ct">원본 민원 (D-01)</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">기본 후보는 같은 층·공간·설비의 미종료 민원, 검색은 보조다. 원본이 없으면 `400 ORIGINAL_REQUIRED`.</p>
+    </div>
+    <div class="card k-api" data-no="5">
+      <div class="card-head">
+        <span class="n n-api">5</span>
+        <span class="ct">반려</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/rejection</div>
+      <p class="cd">주 행동은 폼 하단에 경고색으로. `RECEIVED` 와 `IN_PROGRESS` 에서만 가능하다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">A-03 민원 상세</span> <span class="arr">→</span> <b class="mono">A-05</b>
+          <span class="arr">→</span> <span class="mono fx">A-03 민원 상세 (반려 후)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE(rejection_*) + history(REJECT) INSERT</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="A-06">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 관리소장 <span class="mono">(ADMIN)</span></div>
+        <div class="trow">
+          <span class="idchip mono">A-06</span>
+          <h1>민원 통계</h1>
+          <span class="dname">정비 근거 자료</span>
+          <span class="lead">이력 축적이 돌아오는 자리 — 기간을 고르고 숫자를 읽고, 눌러서 대장으로 내려간다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-309</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.444%">
+          <img src="../../docs/img/pc/A-06.png" alt="A-06">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:19.5%;top:13.13%;width:15.3%;height:4.88%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:17.5%;top:46.25%;width:34.7%;height:31.38%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:17.5%;top:24.00%;width:72.5%;height:6.13%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:81.5%;top:40.37%;width:8.5%;height:4.88%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="5" style="left:92.9%;top:14.13%;width:5.1%;height:3.00%">
+      <span class="n n-ui on-img">5</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">기간 프리셋</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">전체 기간 · 이번 달 · 최근 3개월 셋이면 한 줄에 들어간다. `전체 기간` 이 곧 해제 버튼이다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">막대 → 대장</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">설비 막대를 누르면 그 조건과 기간을 그대로 들고 A-02 로 내려간다. 수치에서 개별 민원까지 한 번에 닿는다.</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">통계 조회</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /statistics</div>
+      <p class="cd">큰 숫자는 총 접수 하나. 완료·반려·처리 중은 같은 문장 안의 숫자로 내려 위계를 만든다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">층 순서 토글</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">건수순과 건물 순서(지하 2층 → 8층)를 바꿔 본다. 동률일 때 순서가 임의로 보이지 않게 한다.</p>
+    </div>
+    <div class="card k-ui" data-no="5">
+      <div class="card-head">
+        <span class="n n-ui">5</span>
+        <span class="ct">적용 중인 기간</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">지금 보고 있는 숫자가 어느 기간의 것인지 항상 우측에 적어 둔다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-01 직원 로그인 (레일 메뉴)</span> <span class="arr">→</span> <b class="mono">A-06</b>
+          <span class="arr">→</span> <span class="mono fx">A-02 전체 민원 (막대 클릭)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">history 의 REGISTER ~ COMPLETE 간격으로 평균 처리 시간 산출</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="E-01">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 예외 상태 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">E-01</span>
+          <h1>선점 충돌</h1>
+          <span class="dname">동시 선점 경합 (409)</span>
+          <span class="lead">두 기사가 같은 민원을 거의 동시에 눌렀을 때 — 먼저 도달한 요청만 성공한다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-202</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/E-01.png" alt="E-01">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:34.8%;top:44.20%;width:30.4%;height:11.38%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:34.7%;top:44.09%;width:30.6%;height:21.23%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-api chip-out" data-no="3" style="left:34.8%;top:55.69%;width:30.4%;height:9.52%">
+      <span class="n n-api on-img">3</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="4" style="left:83.1%;top:32.28%;width:6.9%;height:6.35%">
+      <span class="n n-ui on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">무슨 일이 일어났는지</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">실패가 아니라 남이 먼저 가져갔다는 사실을 말한다. 기사의 잘못이 아니므로 사과나 오류 코드를 쓰지 않는다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">선점 경합</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">낙관적 잠금 — 상태가 `RECEIVED` 일 때만 전이가 일어나고, 나머지 요청은 전부 409 를 받는다 (9.3).</p>
+    </div>
+    <div class="card k-api" data-no="3">
+      <div class="card-head">
+        <span class="n n-api">3</span>
+        <span class="ct">목록으로</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">409 ALREADY_CLAIMED</div>
+      <p class="cd">되돌릴 수 있는 선택지를 주지 않는다. 이미 남의 작업이므로 목록을 새로 읽는 것 외에 할 일이 없다.</p>
+    </div>
+    <div class="card k-ui" data-no="4">
+      <div class="card-head">
+        <span class="n n-ui">4</span>
+        <span class="ct">이 버튼에서</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">Esc 나 배경 클릭도 같은 곳으로 보낸다. 닫았을 때 이미 사라진 작업의 상세에 남아 있지 않게 한다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-03 민원 상세 (맡기)</span> <span class="arr">→</span> <b class="mono">E-01</b>
+          <span class="arr">→</span> <span class="mono fx">W-02 미배정 민원 (목록 새로 읽기)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">status = RECEIVED 조건부 UPDATE — 조건 불일치 시 전이 없음</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="E-02">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 예외 상태 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">E-02</span>
+          <h1>배정 후 수정·취소 제한</h1>
+          <span class="dname">수정 불가 상태</span>
+          <span class="lead">별도 오류 화면이 아니라 상태 그 자체 — 배정되는 순간 두 버튼이 사라진다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-103</span><span class="frchip mono">FR-104</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/E-02.png" alt="E-02">
+          
+    <div class="region r-rule chip-out" data-no="1" style="left:12.5%;top:76.15%;width:43.2%;height:3.28%">
+      <span class="n n-rule on-img">1</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="2" style="left:12.5%;top:20.68%;width:75%;height:5.36%">
+      <span class="n n-ui on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:12.5%;top:38.62%;width:75%;height:3.28%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:58.7%;top:61.93%;width:28.8%;height:14.00%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-rule" data-no="1">
+      <div class="card-head">
+        <span class="n n-rule">1</span>
+        <span class="ct">왜 막는가</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">작업이 시작된 뒤 원문이 바뀌면 기사가 본 지시와 남는 기록이 어긋난다. 추가 전달은 관리실 전화로 안내한다.</p>
+    </div>
+    <div class="card k-ui" data-no="2">
+      <div class="card-head">
+        <span class="n n-ui">2</span>
+        <span class="ct">작업 중</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">누가 맡고 있는지를 이름으로 말한다. 기다리라는 말보다 진행 중이라는 사실이 신고자에게 쓸모 있다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">버튼이 없는 자리</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">수정·취소 버튼을 비활성으로 남기지 않고 아예 걷어낸다. 누를 수 없는 것을 보여주지 않는 편이 낫다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">상태의 근거</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">GET /complaints/{id}</div>
+      <p class="cd">언제 누구에게 배정됐는지가 이력에 남아 있어, 신고자가 화면만 보고도 납득할 수 있다.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-05 민원 상세 (작업 중 상태)</span> <span class="arr">→</span> <b class="mono">E-02</b>
+          <span class="arr">→</span> <span class="mono fx">(관리실 전화 안내)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">status != RECEIVED 이면 수정·취소 경로 자체가 닫힌다</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="E-03">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 예외 상태 <span class="mono">(USER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">E-03</span>
+          <h1>민원 취소 확인</h1>
+          <span class="dname">접수 철회 확인</span>
+          <span class="lead">되돌릴 수 없는 행위 — 비밀번호 확인에 더해 대상을 보여주고 한 번 더 묻는다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-104</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/E-03.png" alt="E-03">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:34.8%;top:37.75%;width:30.4%;height:11.38%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:34.7%;top:37.64%;width:30.6%;height:34.14%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:34.8%;top:49.23%;width:30.4%;height:12.91%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:34.8%;top:62.14%;width:30.4%;height:9.52%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">되돌릴 수 없다</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">다시 접수하려면 새 민원을 등록해야 한다는 사실을 미리 말한다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">이력 보존</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">삭제하지 않고 `CANCELED` 상태로 남긴다. 취소된 접수도 통계와 이력의 일부다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">대상 확인</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">제목·위치·번호를 보여 준다. 여러 건을 조회하다 엉뚱한 민원을 취소하는 일을 막는다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">민원 취소</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/cancel</div>
+      <p class="cd">DELETE 가 아니라 POST 다 — 요청 본문으로 비밀번호를 보내야 하고, 취소가 물리 삭제도 아니기 때문이다 (16.1).</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">U-06 본인 확인</span> <span class="arr">→</span> <b class="mono">E-03</b>
+          <span class="arr">→</span> <span class="mono fx">U-05 민원 상세 (취소됨)</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE(status=CANCELED) + history(CANCEL) — 삭제 아님</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="E-04">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · UI 흐름 — 예외 상태 <span class="mono">(WORKER)</span></div>
+        <div class="trow">
+          <span class="idchip mono">E-04</span>
+          <h1>작업 반납 확인</h1>
+          <span class="dname">반납 확인</span>
+          <span class="lead">맡은 것을 되돌려 놓는 유일한 경로 — 기사 간 직접 이관은 만들지 않았다.</span>
+          <span class="spacer"></span>
+          <span class="frchip mono">FR-203</span>
+          
+        </div>
+      </header>
+      <main>
+        <div class="shot" style="padding-top:44.431%">
+          <img src="../../docs/img/pc/E-04.png" alt="E-04">
+          
+    <div class="region r-ui chip-out" data-no="1" style="left:34.8%;top:32.60%;width:30.4%;height:14.66%">
+      <span class="n n-ui on-img">1</span>
+    </div>
+    <div class="region r-rule chip-out" data-no="2" style="left:34.7%;top:32.49%;width:30.6%;height:44.42%">
+      <span class="n n-rule on-img">2</span>
+    </div>
+    <div class="region r-ui chip-out" data-no="3" style="left:34.8%;top:47.37%;width:30.4%;height:19.91%">
+      <span class="n n-ui on-img">3</span>
+    </div>
+    <div class="region r-api chip-out" data-no="4" style="left:34.8%;top:67.29%;width:30.4%;height:9.52%">
+      <span class="n n-api on-img">4</span>
+    </div>
+        </div>
+        <div class="cardrow">
+    <div class="card k-ui" data-no="1">
+      <div class="card-head">
+        <span class="n n-ui">1</span>
+        <span class="ct">무엇이 사라지는가</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">적던 결과가 저장되지 않는다는 것과, 다른 기사가 맡을 수 있게 된다는 것을 함께 말한다.</p>
+    </div>
+    <div class="card k-rule" data-no="2">
+      <div class="card-head">
+        <span class="n n-rule">2</span>
+        <span class="ct">"취소"라 쓰지 않는다</span>
+      </div>
+      <div class="kind">정책</div>
+      
+      <p class="cd">신고자의 민원 취소(`CANCELED`)와 혼동되기 때문이다. 기사의 행위는 기술서 용어대로 반납이다.</p>
+    </div>
+    <div class="card k-ui" data-no="3">
+      <div class="card-head">
+        <span class="n n-ui">3</span>
+        <span class="ct">반납 사유 (선택)</span>
+      </div>
+      <div class="kind">동작 · 이동</div>
+      
+      <p class="cd">관리소장이 재배정을 판단할 때 쓰는 근거다. 선택 입력이며 처리 이력의 note 로 남는다.</p>
+    </div>
+    <div class="card k-api" data-no="4">
+      <div class="card-head">
+        <span class="n n-api">4</span>
+        <span class="ct">반납</span>
+      </div>
+      <div class="kind">연결 API</div>
+      <div class="api-line">POST /complaints/{id}/release</div>
+      <p class="cd">`IN_PROGRESS → RECEIVED`. 본인이 담당 중이 아니면 `409 NOT_ASSIGNEE`.</p>
+    </div></div>
+        <svg class="wires"></svg>
+      </main>
+      <footer>
+        <div class="fcell legend">
+          <span class="n n-ui"></span> 동작·이동
+          <span class="n n-api"></span> 연결 API
+          <span class="n n-rule"></span> 정책
+        </div>
+        <div class="fcell"><span class="flabel">화면 연결</span>
+          <span class="mono fx">W-06 처리 결과 등록 · W-03 민원 상세</span> <span class="arr">→</span> <b class="mono">E-04</b>
+          <span class="arr">→</span> <span class="mono fx">W-02 미배정 민원</span>
+        </div>
+        <div class="fcell"><span class="flabel">데이터</span><span class="mono fx">complaint UPDATE(담당 해제) + history(RELEASE, note)</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="page" data-id="APPX-API">
+    <div class="rail"></div>
+    <div class="pbody">
+      <header>
+        <div class="kicker">프로젝트 기술서 · 부록 — API 커버리지</div>
+        <div class="trow">
+          <span class="idchip mono">부록</span>
+          <h1>API 커버리지 매트릭스</h1>
+          <span class="dname">엔드포인트 × 사용 화면</span>
+          <span class="lead">openapi.yaml 의 전 엔드포인트가 어느 화면에서 쓰이는지, 쓰이지 않는 것은 무엇인지 드러낸다.</span>
+        </div>
+      </header>
+      <main class="mxmain">
+        <table class="mx">
+          <thead><tr><th>메서드</th><th>경로</th><th>operationId</th><th>대응 기능</th><th>사용 화면</th></tr></thead>
+          <tbody>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints</td>
+      <td class="mx-op mono">createComplaint</td>
+      <td class="mx-fr mono">FR-101</td>
+      <td class="mx-s"><span class="sc mono">U-02</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/complaints</td>
+      <td class="mx-op mono">listComplaints</td>
+      <td class="mx-fr mono">FR-201·204·301·302</td>
+      <td class="mx-s"><span class="sc mono">W-02</span><span class="sc mono">W-05</span><span class="sc mono">A-01</span><span class="sc mono">A-02</span><span class="sc mono">A-05</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/complaints/{id}</td>
+      <td class="mx-op mono">getComplaint</td>
+      <td class="mx-fr mono">FR-102·206</td>
+      <td class="mx-s"><span class="sc mono">U-03</span><span class="sc mono">U-05</span><span class="sc mono">U-07</span><span class="sc mono">W-03</span><span class="sc mono">W-06</span><span class="sc mono">A-03</span><span class="sc mono">A-05</span><span class="sc mono">E-02</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">PATCH</td>
+      <td class="mx-p mono">/complaints/{id}</td>
+      <td class="mx-op mono">updateComplaint</td>
+      <td class="mx-fr mono">FR-103</td>
+      <td class="mx-s"><span class="sc mono">U-07</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/password-verification</td>
+      <td class="mx-op mono">verifyComplaintPassword</td>
+      <td class="mx-fr mono">FR-103·104</td>
+      <td class="mx-s"><span class="sc mono">U-06</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/cancel</td>
+      <td class="mx-op mono">cancelComplaint</td>
+      <td class="mx-fr mono">FR-104</td>
+      <td class="mx-s"><span class="sc mono">E-03</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/auth/login</td>
+      <td class="mx-op mono">login</td>
+      <td class="mx-fr mono">FR-001</td>
+      <td class="mx-s"><span class="sc mono">W-01</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/complaints/{id}/related</td>
+      <td class="mx-op mono">getRelatedComplaints</td>
+      <td class="mx-fr mono">FR-206</td>
+      <td class="mx-s"><span class="sc mono">W-03</span><span class="sc mono">A-03</span><span class="sc mono">A-05</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/claim</td>
+      <td class="mx-op mono">claimComplaint</td>
+      <td class="mx-fr mono">FR-202</td>
+      <td class="mx-s"><span class="sc mono">W-03</span><span class="sc mono">W-04</span><span class="sc mono">E-01</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/release</td>
+      <td class="mx-op mono">releaseComplaint</td>
+      <td class="mx-fr mono">FR-203</td>
+      <td class="mx-s"><span class="sc mono">E-04</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/completion</td>
+      <td class="mx-op mono">completeComplaint</td>
+      <td class="mx-fr mono">FR-205</td>
+      <td class="mx-s"><span class="sc mono">W-06</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/dashboard</td>
+      <td class="mx-op mono">getDashboard</td>
+      <td class="mx-fr mono">FR-301·302·303</td>
+      <td class="mx-s"><span class="sc mono">A-01</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/workers</td>
+      <td class="mx-op mono">listWorkers</td>
+      <td class="mx-fr mono">FR-303</td>
+      <td class="mx-s"><span class="sc mono">A-02</span><span class="sc mono">A-03</span><span class="sc mono">A-04</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/assignment</td>
+      <td class="mx-op mono">assignComplaint</td>
+      <td class="mx-fr mono">FR-304·305</td>
+      <td class="mx-s"><span class="sc mono">A-04</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">DELETE</td>
+      <td class="mx-p mono">/complaints/{id}/assignment</td>
+      <td class="mx-op mono">revokeAssignment</td>
+      <td class="mx-fr mono">FR-306</td>
+      <td class="mx-s"><span class="sc mono">A-03</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">PATCH</td>
+      <td class="mx-p mono">/complaints/{id}/classification</td>
+      <td class="mx-op mono">updateClassification</td>
+      <td class="mx-fr mono">FR-307</td>
+      <td class="mx-s"><span class="sc mono">A-03</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">POST</td>
+      <td class="mx-p mono">/complaints/{id}/rejection</td>
+      <td class="mx-op mono">rejectComplaint</td>
+      <td class="mx-fr mono">FR-308</td>
+      <td class="mx-s"><span class="sc mono">A-05</span></td>
+    </tr>
+    <tr class="">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/statistics</td>
+      <td class="mx-op mono">getStatistics</td>
+      <td class="mx-fr mono">FR-309</td>
+      <td class="mx-s"><span class="sc mono">A-06</span></td>
+    </tr>
+    <tr class="is-gap">
+      <td class="mx-m mono">GET</td>
+      <td class="mx-p mono">/categories</td>
+      <td class="mx-op mono">listCategories</td>
+      <td class="mx-fr mono">기준 데이터</td>
+      <td class="mx-s"><span class="sc-none">사용 화면 없음</span></td>
+    </tr></tbody>
+        </table>
+        <div class="mxnotes">
+          <div class="mxn"><div class="mxn-t">화면에서 호출하지 않는 엔드포인트</div><p>`GET /categories` 하나. 프로토타입은 설비 목록을 `constants.js` 상수로 들고 있다. 실제 구현에서는 U-02·U-07 의 설비 선택지와 A-02·A-03 의 설비 필터를 이 엔드포인트로 채운다.</p></div><div class="mxn"><div class="mxn-t">API 를 부르지 않는 조작</div><p>W-02 · A-02 의 정렬 선택, A-06 의 층 순서 토글, W-05 의 탭 전환은 표시 계층에서만 동작한다. 서버 정렬과 기본 질의를 바꾸지 않겠다는 결정의 결과다.</p></div><div class="mxn"><div class="mxn-t">한 엔드포인트가 여러 화면</div><p>`GET /complaints` 가 미배정 목록 · 내 작업 · 전체 민원 · 지연 민원 네 화면을 담당한다. 화면별로 질의 조건만 다르다 (15.2).</p></div><div class="mxn"><div class="mxn-t">상세 조회의 짝</div><p>`GET /complaints/{id}` 와 `/related` 는 W-03 · A-03 · A-05 에서 항상 함께 호출된다 — 중복 판단에 같은 위치 민원이 필요하기 때문이다.</p></div>
+        </div>
+      </main>
+      <footer>
+        <div class="fcell"><span class="flabel">집계 기준</span>
+          <span class="fx">docs/openapi.yaml 의 operationId 전수 × src/views 의 @/mock/api import 대조</span>
+        </div>
       </footer>
     </div>
   </div>
 <script>
   // 참조 영역 하단 → 카드 상단을 직교선으로 잇는다.
   // 영역이 넓으면 카드와 가장 가까운 x 지점에 앵커를 잡아 선을 거의 수직으로 유지한다.
+  // 전이도: 노드 사이를 직교선 + 화살촉으로 잇는다.
   addEventListener('load', () => {
-    document.querySelectorAll('.page').forEach(page => {
+    document.querySelectorAll('.page[data-id^="FLOW"]').forEach(page => {
+      const main = page.querySelector('.flowmain');
+      const svg = page.querySelector('.fwires');
+      const edges = JSON.parse(page.querySelector('.fedges').textContent);
+      const mr = main.getBoundingClientRect();
+      svg.setAttribute('viewBox', '0 0 ' + mr.width + ' ' + mr.height);
+      const box = id => {
+        const el = main.querySelector('.fnode[data-id="' + id + '"]');
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { l: r.left - mr.left, r: r.right - mr.left, t: r.top - mr.top, b: r.bottom - mr.top,
+                 cx: r.left + r.width / 2 - mr.left, cy: r.top + r.height / 2 - mr.top };
+      };
+      const add = (tag, attrs, text) => {
+        const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+        if (text != null) n.textContent = text;
+        svg.appendChild(n); return n;
+      };
+      const gb = main.querySelector('.fgrid').getBoundingClientRect();
+      const railTop = gb.top - mr.top + 4, railBot = gb.bottom - mr.top - 4;
+      edges.forEach(e => {
+        const a = box(e.from), b = box(e.to);
+        if (!a || !b) return;
+        const kind = e.kind || 'main';
+        const dy = e.dy || 0;
+        let d, tip, ang, lx, ly, anchor = 'middle';
+        if (e.route === 'bottom' || e.route === 'top') {          // 되돌아오는 긴 경로는 레일로 우회
+          const rail = e.route === 'bottom' ? railBot : railTop;
+          const y1 = e.route === 'bottom' ? a.b : a.t;
+          const y2 = e.route === 'bottom' ? b.b : b.t;
+          d = 'M' + a.cx + ',' + y1 + ' L' + a.cx + ',' + rail + ' L' + b.cx + ',' + rail + ' L' + b.cx + ',' + y2;
+          tip = [b.cx, y2]; ang = e.route === 'bottom' ? 270 : 90;
+          lx = (a.cx + b.cx) / 2; ly = rail + (e.route === 'bottom' ? -2.5 : 8);
+        } else if (Math.abs(a.cy - b.cy) < 4) {                   // 같은 행 — 수평
+          const ltr = a.cx < b.cx;
+          const x1 = ltr ? a.r : a.l, x2 = ltr ? b.l : b.r;
+          const y = a.cy + dy;
+          d = 'M' + x1 + ',' + y + ' L' + x2 + ',' + y;
+          tip = [x2, y]; ang = ltr ? 0 : 180;
+          lx = x1 + (x2 - x1) * (e.lt != null ? e.lt : 0.5); ly = y - 4.5;
+        } else if (Math.abs(a.cx - b.cx) < 4) {                   // 같은 열 — 수직
+          const ttb = a.cy < b.cy;
+          const y1 = ttb ? a.b : a.t, y2 = ttb ? b.t : b.b;
+          d = 'M' + a.cx + ',' + y1 + ' L' + b.cx + ',' + y2;
+          tip = [b.cx, y2]; ang = ttb ? 90 : 270;
+          lx = a.cx + 3; ly = (y1 + y2) / 2; anchor = 'start';
+        } else {                                                  // 꺾어서
+          const ltr = a.cx < b.cx;
+          const x1 = ltr ? a.r : a.l, x2 = ltr ? b.l : b.r;
+          const mx = x1 + (x2 - x1) * 0.45;
+          d = 'M' + x1 + ',' + (a.cy + dy) + ' L' + mx + ',' + (a.cy + dy) +
+              ' L' + mx + ',' + (b.cy + dy) + ' L' + x2 + ',' + (b.cy + dy);
+          tip = [x2, b.cy + dy]; ang = ltr ? 0 : 180;
+          lx = mx + (ltr ? 3 : -3); ly = (a.cy + b.cy) / 2 + dy;
+          anchor = ltr ? 'start' : 'end';
+        }
+        add('path', { d: d, class: 'e-' + kind });
+        // 라벨을 먼저 깔고 화살촉을 마지막에 얹어, 배경이 촉을 덮지 않게 한다
+        if (e.label) {
+          const t = add('text', { x: lx, y: ly, 'text-anchor': anchor, class: kind === 'err' ? 't-err' : '' }, e.label);
+          const bb = t.getBBox();
+          const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          bg.setAttribute('x', bb.x - 1.5); bg.setAttribute('y', bb.y - 0.5);
+          bg.setAttribute('width', bb.width + 3); bg.setAttribute('height', bb.height + 1);
+          bg.setAttribute('fill', '#FAF9F7');
+          svg.insertBefore(bg, t);
+        }
+        const sz = 4;
+        const pts = ang === 0 ? [[tip[0], tip[1]], [tip[0] - sz, tip[1] - sz * .6], [tip[0] - sz, tip[1] + sz * .6]]
+                  : ang === 180 ? [[tip[0], tip[1]], [tip[0] + sz, tip[1] - sz * .6], [tip[0] + sz, tip[1] + sz * .6]]
+                  : ang === 90 ? [[tip[0], tip[1]], [tip[0] - sz * .6, tip[1] - sz], [tip[0] + sz * .6, tip[1] - sz]]
+                  : [[tip[0], tip[1]], [tip[0] - sz * .6, tip[1] + sz], [tip[0] + sz * .6, tip[1] + sz]];
+        add('polygon', { points: pts.map(p => p.join(',')).join(' '), class: 'a-' + kind });
+      });
+    });
+
+    document.querySelectorAll('.page[data-id]:not([data-id^="FLOW"]):not([data-id^="APPX"])').forEach(page => {
       const main = page.querySelector('main');
       const svg = page.querySelector('.wires');
       const mr = main.getBoundingClientRect();

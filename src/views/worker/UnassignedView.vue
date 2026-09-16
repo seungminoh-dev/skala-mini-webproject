@@ -6,10 +6,11 @@ import StaffShell from '@/components/StaffShell.vue'
 import { listUnassigned } from '@/mock/api'
 import { CATEGORIES, FLOORS, categoryName, priorityName } from '@/mock/constants'
 import { TERMS } from '@/utils/labels'
+import { clockLabel } from '@/utils/format'
 import { auth } from '@/stores/auth'
 
 const router = useRouter()
-const items = ref([]); const loading = ref(true)
+const items = ref([]); const loading = ref(true); const at = ref(null)
 
 // 기사가 훑는 기준을 직접 고른다. 정렬은 표시 계층에서만 하고 API 호출은 바꾸지 않는다 (WX-27).
 const SORTS = [
@@ -31,6 +32,7 @@ async function load() {
   loading.value = true
   const code = filter.value && filter.value !== 'MINE' ? filter.value : null
   items.value = await listUnassigned({ categoryCode: code })
+  at.value = new Date()
   loading.value = false
 }
 onMounted(load)
@@ -50,7 +52,9 @@ const shown = computed(() => {
 })
 const lateCount = computed(() => shown.value.filter((c) => c.delayed).length)
 const sub = computed(() =>
-  `담당자 미배정 민원 ${shown.value.length}건` + (lateCount.value ? ` · 지연 ${lateCount.value}건` : ''))
+  `담당자 미배정 민원 ${shown.value.length}건`
+  + (lateCount.value ? ` · 지연 ${lateCount.value}건` : '')
+  + (at.value ? ` · ${clockLabel(at.value)} 기준` : ''))
 
 const open = (id) => router.push({ name: 'worker-complaint', params: { id } })
 </script>
@@ -64,7 +68,9 @@ const open = (id) => router.push({ name: 'worker-complaint', params: { id } })
     <template #toolbar>
       <div class="toolbar">
         <div class="filters">
+          <!-- 내 담당은 설비 하나가 아니라 "내 것" 이라는 다른 종류의 조건이다. 선으로 끊는다 (UX-08) -->
           <button class="ftog" :class="{ on: filter === 'MINE' }" @click="filter = 'MINE'">내 담당</button>
+          <span class="fsep" aria-hidden="true" />
           <button class="ftog" :class="{ on: filter === '' }" @click="filter = ''">전체</button>
           <button v-for="c in CATEGORIES" :key="c.code" class="ftog" :class="{ on: filter === c.code }"
             @click="filter = c.code">{{ c.name }}</button>

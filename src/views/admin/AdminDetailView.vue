@@ -73,7 +73,19 @@ const matches = (w) => w.categories.includes(c.value?.categoryCode)
 // 같은 자리 작업은 중복 판단의 근거다 — 관리소장 화면에도 둔다
 const relatedOwner = (r) => r.assigneeName ?? TERMS.unassigned
 
-onMounted(load)
+onMounted(async () => {
+  await load()
+  // 모달 자동 열기는 진입 시 한 번뿐이다. load() 는 배정·회수·저장 뒤에도 불리므로
+  // 여기서 열고 주소에서 플래그를 지운다 (BUG-01).
+  const open = devModal('assign') ? 'assign' : devModal('revoke') ? 'revoke' : null
+  if (!open) return
+  if (open === 'assign') pick.value = true
+  else askRevoke.value = true
+  const query = { ...route.query }
+  delete query.modal
+  router.replace({ path: route.path, query })
+})
+
 async function load() {
   loading.value = true
   try {
@@ -82,8 +94,6 @@ async function load() {
     cls.value = { floor: x.floor, space: x.space, categoryCode: x.categoryCode, priority: x.priority }
     workers.value = await listWorkers()
   } catch (e) { error.value = e.message } finally { loading.value = false }
-  if (devModal('assign')) pick.value = true
-  if (devModal('revoke')) askRevoke.value = true
 }
 
 // 안내는 다음 행동을 시작할 때 지운다 — 지난 행동의 안내가 남아 있지 않게 (AX-19)
@@ -247,7 +257,8 @@ function goReject() {
 
             <!-- 분류 정보 수정은 보조 행동이다. 항상 열려 있지 않는다 (AX-14, AX-17) -->
             <div class="fold" style="margin-top: 34px">
-              <button class="fold-h" :aria-expanded="clsOpen" @click="clsOpen = !clsOpen">
+              <button class="fold-h" :aria-expanded="clsOpen" :aria-label="TERMS.classify"
+                @click="clsOpen = !clsOpen">
                 <span>{{ TERMS.classify }}</span>
                 <span class="fold-m">{{ clsOpen ? '접기' : '펼치기' }}</span>
               </button>

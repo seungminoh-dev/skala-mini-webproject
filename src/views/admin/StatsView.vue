@@ -129,10 +129,11 @@ const openCount = computed(() => (s.value ? s.value.total - s.value.completed - 
           <section>
             <p class="sect">설비별 발생 건수</p>
             <div class="bars">
-              <button v-for="r in byCategory" :key="r.key" class="bar link" @click="drill({ category: r.key })">
+              <button v-for="r in byCategory" :key="r.key" class="bar link"
+                :aria-label="`${r.name} ${r.count}건, ${r.pct}%`" @click="drill({ category: r.key })">
                 <span class="nm">{{ r.name }}</span>
                 <span class="track"><span class="fill" :style="{ width: `${r.w}%` }" /></span>
-                <span class="vl">{{ r.count }}<span>{{ r.pct }}%</span></span>
+                <span class="vl">{{ r.count }}건<span>{{ r.pct }}%</span></span>
               </button>
             </div>
           </section>
@@ -147,10 +148,11 @@ const openCount = computed(() => (s.value ? s.value.total - s.value.completed - 
               </span>
             </div>
             <div class="bars">
-              <button v-for="r in byFloor" :key="r.key" class="bar link" @click="drill({ floor: r.key })">
+              <button v-for="r in byFloor" :key="r.key" class="bar link"
+                :aria-label="`${r.name} ${r.count}건, ${r.pct}%`" @click="drill({ floor: r.key })">
                 <span class="nm">{{ r.name }}</span>
                 <span class="track"><span class="fill" :style="{ width: `${r.w}%` }" /></span>
-                <span class="vl">{{ r.count }}<span>{{ r.pct }}%</span></span>
+                <span class="vl">{{ r.count }}건<span>{{ r.pct }}%</span></span>
               </button>
             </div>
           </section>

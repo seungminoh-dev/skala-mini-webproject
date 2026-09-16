@@ -6,11 +6,11 @@ import StaffShell from '@/components/StaffShell.vue'
 import { listMyTasks } from '@/mock/api'
 import { categoryName, priorityName } from '@/mock/constants'
 import { TERMS } from '@/utils/labels'
-import { elapsedShort, formatDateTime } from '@/utils/format'
+import { clockLabel, elapsedShort, formatDateTime } from '@/utils/format'
 import { auth } from '@/stores/auth'
 
 const router = useRouter()
-const tab = ref('IN_PROGRESS'); const items = ref([]); const loading = ref(true)
+const tab = ref('IN_PROGRESS'); const items = ref([]); const loading = ref(true); const at = ref(null)
 const working = computed(() => tab.value === 'IN_PROGRESS')
 
 async function load() {
@@ -18,14 +18,23 @@ async function load() {
   const list = await listMyTasks(auth.state.user.id, tab.value)
   // 작업 중은 오래 붙잡고 있는 것이 위로 온다. 완료는 최근 완료 순(API 기본)을 그대로 쓴다.
   items.value = working.value ? [...list].reverse() : list
+  at.value = new Date()
   loading.value = false
 }
 onMounted(load)
 watch(tab, load)
 
-const sub = computed(() => `${working.value ? '작업 중' : '완료'} ${items.value.length}건`)
-// 조치 내용 첫 줄만 요약으로 쓴다. 내용이 없으면 완료됐다는 사실만 말한다.
-const summary = (c) => c.resolution?.content?.split('\n')[0] || '작업 완료'
+const sub = computed(() =>
+  `${working.value ? '작업 중' : '완료'} ${items.value.length}건`
+  + (at.value ? ` · ${clockLabel(at.value)} 기준` : ''))
+// 목록은 훑는 자리다. 조치 내용은 첫 문장(또는 40자)까지만 보이고 전문은 행을 눌러 읽는다 (UX-07).
+function summary(c) {
+  const text = c.resolution?.content?.split('\n')[0]?.trim()
+  if (!text) return '작업 완료'
+  const stop = text.indexOf('. ')
+  const first = stop > 0 ? text.slice(0, stop + 1) : text
+  return first.length > 40 ? `${first.slice(0, 40)}…` : first
+}
 
 const open = (id) => router.push({ name: 'worker-complaint', params: { id }, query: { from: 'tasks' } })
 const complete = (id) => router.push({ name: 'worker-complete', params: { id } })

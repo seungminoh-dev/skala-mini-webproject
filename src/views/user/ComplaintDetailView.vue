@@ -180,7 +180,7 @@ async function retry() {
             <p class="sect">조치 결과</p>
             <p style="font-size: 15px; line-height: 1.7">{{ c.resolution.content }}</p>
             <p class="hint" style="margin-top: 8px">
-              접수부터 완료까지 {{ durationLabel(minutesBetween(c.createdAt, c.completedAt)) }}{{ c.completedAt ? ` · ${formatDateTime(c.completedAt)} 완료` : '' }}
+              처리 시간 {{ durationLabel(minutesBetween(c.createdAt, c.completedAt)) }} (접수 → 완료){{ c.completedAt ? ` · ${formatDateTime(c.completedAt)} 완료` : '' }}
             </p>
           </template>
 

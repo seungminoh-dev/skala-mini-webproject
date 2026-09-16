@@ -7,9 +7,10 @@ import StatusMark from '@/components/StatusMark.vue'
 import { listComplaints, listWorkers } from '@/mock/api'
 import { CATEGORIES, FLOORS, PRIORITIES, STATUSES, categoryName, priorityName } from '@/mock/constants'
 import { TERMS, statusLabel } from '@/utils/labels'
+import { clockLabel } from '@/utils/format'
 
 const route = useRoute(); const router = useRouter()
-const items = ref([]); const loading = ref(true); const workers = ref([])
+const items = ref([]); const loading = ref(true); const workers = ref([]); const at = ref(null)
 
 const SORTS = [
   { code: 'new', label: '최신 접수순' },
@@ -62,6 +63,7 @@ async function load() {
     delayedOnly: delayedOnly.value,
     keyword: applied.value.trim() || null
   })
+  at.value = new Date()
   loading.value = false
   syncUrl()
 }
@@ -113,7 +115,7 @@ const open = (id) => router.push({ name: 'admin-complaint', params: { id }, quer
 </script>
 
 <template>
-  <StaffShell :title="TERMS.allComplaints" :sub="`${shown.length}건`">
+  <StaffShell :title="TERMS.allComplaints" :sub="`${shown.length}건${at ? ` · ${clockLabel(at)} 기준` : ''}`">
     <template #toolbar>
       <div class="toolbar" style="display: block">
         <div class="fbar">
@@ -131,8 +133,8 @@ const open = (id) => router.push({ name: 'admin-complaint', params: { id }, quer
             </div>
           </div>
           <!-- 지연은 상태가 아니라 경과 조건이다. 상태 세그먼트와 층위를 나눈다 (AX-03) -->
-          <label class="fswitch">
-            <input v-model="delayedOnly" type="checkbox" /> 지연만
+          <label class="fswitch" for="f-delayed">
+            <input id="f-delayed" v-model="delayedOnly" type="checkbox" aria-label="지연만" /> 지연만
           </label>
         </div>
 
@@ -165,13 +167,6 @@ const open = (id) => router.push({ name: 'admin-complaint', params: { id }, quer
             <span class="hint">~</span>
             <input v-model="to" type="date" class="input" aria-label="종료일" />
           </div>
-          <span style="flex: 1" />
-          <div class="fgrp">
-            <span class="fk">정렬</span>
-            <select v-model="sort" class="select" aria-label="정렬 기준">
-              <option v-for="s in SORTS" :key="s.code" :value="s.code">{{ s.label }}</option>
-            </select>
-          </div>
         </div>
       </div>
 
@@ -180,6 +175,13 @@ const open = (id) => router.push({ name: 'admin-complaint', params: { id }, quer
         <b>{{ shown.length }}건</b>
         <span v-if="conditions.length" class="cond">· {{ conditions.join(' · ') }}</span>
         <span class="grow" />
+        <!-- 정렬은 조건이 아니라 보는 방식이다. 조건 요약 줄 끝에 둔다 (UX-09) -->
+        <span class="fgrp">
+          <span class="fk">정렬</span>
+          <select v-model="sort" class="select" aria-label="정렬 기준">
+            <option v-for="s in SORTS" :key="s.code" :value="s.code">{{ s.label }}</option>
+          </select>
+        </span>
         <button v-if="conditions.length" class="btn line sm" @click="clearAll">필터 해제</button>
       </div>
     </template>
