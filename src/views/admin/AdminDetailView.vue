@@ -1,234 +1,140 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import AppBar from '@/components/AppBar.vue'
-import StatusBadge from '@/components/StatusBadge.vue'
-import ModalSheet from '@/components/ModalSheet.vue'
-import {
-  assignComplaint,
-  getComplaint,
-  listWorkers,
-  revokeAssignment,
-  updateClassification
-} from '@/mock/api'
+import StaffShell from '@/components/StaffShell.vue'
+import StatusMark from '@/components/StatusMark.vue'
+import AppDialog from '@/components/AppDialog.vue'
+import { assignComplaint, getComplaint, listWorkers, revokeAssignment, updateClassification } from '@/mock/api'
 import { CATEGORIES, FLOORS, PRIORITIES, SPACES, categoryName } from '@/mock/constants'
 import { actionLabel, formatDateTime } from '@/utils/format'
 import { auth } from '@/stores/auth'
 import { devModal } from '@/utils/devModal'
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute(); const router = useRouter()
 const id = route.params.id
-
-const complaint = ref(null)
-const loading = ref(true)
-const busy = ref(false)
-const error = ref('')
-const savedNote = ref('')
-
-const classification = ref({ floor: '', space: '', categoryCode: '', priority: '' })
-
-const showAssign = ref(false)
-const workers = ref([])
-const selectedWorker = ref('')
+const c = ref(null); const loading = ref(true); const busy = ref(false); const error = ref(''); const saved = ref('')
+const cls = ref({ floor: '', space: '', categoryCode: '', priority: '' })
+const pick = ref(false); const workers = ref([]); const chosen = ref('')
 
 onMounted(load)
-
 async function load() {
   loading.value = true
   try {
-    const c = await getComplaint(id)
-    complaint.value = c
-    classification.value = {
-      floor: c.floor, space: c.space, categoryCode: c.categoryCode, priority: c.priority
-    }
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    loading.value = false
-  }
-  if (devModal('assign')) await openAssign()
+    const x = await getComplaint(id); c.value = x
+    cls.value = { floor: x.floor, space: x.space, categoryCode: x.categoryCode, priority: x.priority }
+  } catch (e) { error.value = e.message } finally { loading.value = false }
+  if (devModal('assign')) await openPick()
 }
-
-async function saveClassification() {
-  busy.value = true
-  error.value = ''
-  savedNote.value = ''
-  try {
-    complaint.value = await updateClassification(id, classification.value, auth.state.user.name)
-    savedNote.value = '분류 정보를 수정했습니다.'
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    busy.value = false
-  }
+async function saveCls() {
+  busy.value = true; error.value = ''; saved.value = ''
+  try { c.value = await updateClassification(id, cls.value, auth.state.user.name); saved.value = '고쳤습니다.' }
+  catch (e) { error.value = e.message } finally { busy.value = false }
 }
-
-async function openAssign() {
-  workers.value = await listWorkers()
-  selectedWorker.value = ''
-  showAssign.value = true
-}
-
+async function openPick() { workers.value = await listWorkers(); chosen.value = ''; pick.value = true }
 async function doAssign() {
-  if (!selectedWorker.value) return
+  if (!chosen.value) return
   busy.value = true
-  try {
-    complaint.value = await assignComplaint(id, selectedWorker.value, auth.state.user.name)
-    showAssign.value = false
-    await load()
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    busy.value = false
-  }
+  try { await assignComplaint(id, chosen.value, auth.state.user.name); pick.value = false; await load() }
+  catch (e) { error.value = e.message } finally { busy.value = false }
 }
-
 async function doRevoke() {
   busy.value = true
-  try {
-    complaint.value = await revokeAssignment(id, auth.state.user.name)
-    await load()
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    busy.value = false
-  }
+  try { await revokeAssignment(id, auth.state.user.name); await load() }
+  catch (e) { error.value = e.message } finally { busy.value = false }
 }
 </script>
 
 <template>
-  <AppBar title="민원 상세" :back="{ path: '/admin/complaints' }" />
-
-  <main class="screen narrow">
-    <p v-if="loading" class="empty">불러오는 중…</p>
-
-    <template v-else-if="complaint">
-      <div style="display: flex; align-items: center; justify-content: space-between">
-        <span v-if="complaint.delayed" class="badge delay">지연</span>
-        <StatusBadge v-else :status="complaint.status" />
-        <span style="font-size: 11.5px; color: var(--text-3)">{{ complaint.id }}</span>
-      </div>
-
-      <h2 style="font-size: 18px; margin: 10px 0 14px; line-height: 1.4">{{ complaint.title }}</h2>
-
-      <div class="card">
-        <div class="kv">
-          <div>
-            <div class="k">위치</div>
-            <div class="v">{{ complaint.floor }} · {{ complaint.space }}</div>
-          </div>
-          <div>
-            <div class="k">설비 카테고리</div>
-            <div class="v">{{ categoryName(complaint.categoryCode) }}</div>
-          </div>
-          <div>
-            <div class="k">담당자</div>
-            <div class="v">{{ complaint.assigneeName ?? '미배정' }}</div>
-          </div>
-          <div>
-            <div class="k">경과</div>
-            <div class="v">{{ complaint.elapsed }}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-title">신고 내용</div>
-      <div class="card">
-        <p style="font-size: 13.5px; line-height: 1.6; margin: 0; white-space: pre-wrap">{{ complaint.content }}</p>
-      </div>
-
-      <!-- FR-307: 분류 정보만 수정 가능. 신고 원문은 수정 대상이 아니다. -->
-      <div class="section-title">분류 정보 수정</div>
-      <div class="card">
-        <p class="hint" style="margin-bottom: 10px">
-          신고 원문(제목·내용·사진)은 신고자의 진술 기록이므로 수정할 수 없습니다.
-        </p>
-        <div class="row2" style="margin-bottom: 8px">
-          <select v-model="classification.floor" class="select">
-            <option v-for="f in FLOORS" :key="f" :value="f">{{ f }}</option>
-          </select>
-          <select v-model="classification.space" class="select">
-            <option v-for="s in SPACES" :key="s" :value="s">{{ s }}</option>
-          </select>
-        </div>
-        <select v-model="classification.categoryCode" class="select" style="margin-bottom: 8px">
-          <option v-for="c in CATEGORIES" :key="c.code" :value="c.code">{{ c.name }}</option>
-        </select>
-        <div class="chips" style="margin-bottom: 10px">
-          <button
-            v-for="p in PRIORITIES"
-            :key="p.code"
-            class="chip"
-            :class="{ on: classification.priority === p.code }"
-            @click="classification.priority = p.code"
-          >
-            {{ p.name }}
-          </button>
-        </div>
-        <button class="btn ghost" :disabled="busy" @click="saveClassification">분류 정보 수정</button>
-        <p v-if="savedNote" class="hint" style="color: var(--green); margin-top: 8px">{{ savedNote }}</p>
-      </div>
-
-      <div class="section-title">처리 이력</div>
-      <div class="card">
-        <div class="timeline">
-          <div v-for="(h, i) in complaint.history" :key="i" class="node">
-            <div class="act">{{ actionLabel(h.action) }}</div>
-            <div class="at">{{ formatDateTime(h.at) }} · {{ h.actorName }}{{ h.note ? ` · ${h.note}` : '' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <p v-if="error" class="notice error" style="margin-top: 14px">{{ error }}</p>
-
-      <template v-if="['RECEIVED', 'IN_PROGRESS'].includes(complaint.status)">
-        <div class="btn-row" style="margin-top: 14px">
-          <button class="btn" :disabled="busy" @click="openAssign">
-            {{ complaint.status === 'RECEIVED' ? '강제 배정' : '재배정' }}
-          </button>
-          <button
-            class="btn ghost"
-            :disabled="busy || complaint.status !== 'IN_PROGRESS'"
-            @click="doRevoke"
-          >
-            배정 회수
-          </button>
-        </div>
-        <button
-          class="btn danger-ghost"
-          style="margin-top: 8px"
-          @click="router.push({ name: 'admin-reject', params: { id } })"
-        >
-          민원 반려
+  <StaffShell title="민원 상세" sub="담당자를 정하거나, 잘못 들어온 정보를 바로잡습니다">
+    <template #actions>
+      <template v-if="c && ['RECEIVED', 'IN_PROGRESS'].includes(c.status)">
+        <button class="btn warn-line" @click="router.push({ name: 'admin-reject', params: { id } })">반려</button>
+        <button v-if="c.status === 'IN_PROGRESS'" class="btn line" :disabled="busy" @click="doRevoke">담당 해제</button>
+        <button class="btn" :disabled="busy" @click="openPick">
+          {{ c.status === 'RECEIVED' ? '담당자 지정' : '담당자 변경' }}
         </button>
       </template>
     </template>
-  </main>
 
-  <!-- A-04 강제 배정: 작업자별 보유 건수를 근거로 대상을 고른다 (AS-02 해소) -->
-  <ModalSheet v-if="showAssign" @close="showAssign = false">
-    <h2 style="text-align: left">작업자 선택</h2>
-    <p style="text-align: left">담당 카테고리와 현재 보유 건수를 확인하고 배정합니다.</p>
-    <div
-      v-for="w in workers"
-      :key="w.id"
-      class="card"
-      style="display: flex; align-items: center; justify-content: space-between; cursor: pointer"
-      :style="selectedWorker === w.id ? 'border-color: var(--blue); background: var(--blue-weak)' : ''"
-      @click="selectedWorker = w.id"
-    >
-      <div>
-        <div style="font-size: 14px; font-weight: 700">{{ w.name }}</div>
-        <div class="hint" style="margin-top: 2px">
-          {{ w.categories.length > 3 ? '전 카테고리' : w.categories.map(categoryName).join(', ') }}
+    <div class="page">
+      <p v-if="loading" class="empty">불러오는 중…</p>
+
+      <template v-else-if="c">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <StatusMark :status="c.status" :late="c.delayed" />
+          <span class="mono hint">{{ c.id }}</span>
         </div>
-      </div>
-      <div style="font-size: 14px; font-weight: 700; color: var(--text-2)">{{ w.holding }}건</div>
+        <h2 style="font-size: 23px; font-weight: 700; color: var(--ink); margin: 10px 0 20px; letter-spacing: -0.02em">{{ c.title }}</h2>
+
+        <div class="defs">
+          <div><dt>위치</dt><dd>{{ c.floor }} · {{ c.space }}</dd></div>
+          <div><dt>설비</dt><dd>{{ categoryName(c.categoryCode) }}</dd></div>
+          <div><dt>담당 기사</dt><dd>{{ c.assigneeName ?? '없음' }}</dd></div>
+          <div><dt>접수</dt><dd class="mono">{{ c.elapsed }}</dd></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; margin-top: 32px; align-items: start">
+          <section>
+            <p class="sect">신고 내용</p>
+            <p style="font-size: 14.5px; line-height: 1.75; white-space: pre-wrap">{{ c.content }}</p>
+
+            <p class="sect" style="margin-top: 30px">요청 정보 바로잡기</p>
+            <p class="hint" style="margin-bottom: 12px">
+              신고자가 잘못 고른 위치·설비·긴급도를 고칠 수 있습니다.
+              <strong style="color: var(--ink)">신고 내용 자체는 고치지 않습니다</strong> — 신고자가 적은 말은 그대로 둡니다.
+            </p>
+            <div style="max-width: 460px">
+              <div class="row2" style="margin-bottom: 8px">
+                <select v-model="cls.floor" class="select"><option v-for="f in FLOORS" :key="f" :value="f">{{ f }}</option></select>
+                <select v-model="cls.space" class="select"><option v-for="s in SPACES" :key="s" :value="s">{{ s }}</option></select>
+              </div>
+              <select v-model="cls.categoryCode" class="select" style="margin-bottom: 8px">
+                <option v-for="x in CATEGORIES" :key="x.code" :value="x.code">{{ x.name }}</option>
+              </select>
+              <div class="filters" style="margin-bottom: 12px">
+                <button v-for="p in PRIORITIES" :key="p.code" class="ftog" :class="{ on: cls.priority === p.code }"
+                  @click="cls.priority = p.code">{{ p.name }}</button>
+              </div>
+              <button class="btn line" :disabled="busy" @click="saveCls">바로잡기</button>
+              <p v-if="saved" class="hint" style="color: var(--blue); margin-top: 8px">{{ saved }}</p>
+            </div>
+
+            <p v-if="error" class="note warn" style="margin-top: 16px">{{ error }}</p>
+          </section>
+
+          <section>
+            <p class="sect">처리 이력</p>
+            <div class="timeline">
+              <div v-for="(h, i) in c.history" :key="i" class="ev">
+                <div class="act">{{ actionLabel(h.action) }}</div>
+                <div class="at">{{ formatDateTime(h.at) }} · {{ h.actorName }}{{ h.note ? ` · ${h.note}` : '' }}</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </template>
     </div>
-    <button class="btn" style="margin-top: 14px" :disabled="!selectedWorker || busy" @click="doAssign">
-      강제 배정하기
-    </button>
-    <button class="btn ghost" @click="showAssign = false">닫기</button>
-  </ModalSheet>
+
+    <AppDialog v-if="pick" title="담당자 지정" message="지금 맡고 있는 작업 수를 보고 고르세요." @close="pick = false">
+      <template #body>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <tbody>
+              <tr v-for="w in workers" :key="w.id" :class="{ sel: chosen === w.id }" style="cursor: pointer" @click="chosen = w.id">
+                <td>
+                  <div class="title">{{ w.name }}</div>
+                  <div class="num">{{ w.categories.length > 3 ? '전 설비' : w.categories.map(categoryName).join(', ') }}</div>
+                </td>
+                <td class="right mono" style="width: 60px; font-weight: 700; color: var(--ink)">{{ w.holding }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+      <template #actions>
+        <button class="btn line" @click="pick = false">닫기</button>
+        <button class="btn" :disabled="!chosen || busy" @click="doAssign">지정하기</button>
+      </template>
+    </AppDialog>
+  </StaffShell>
 </template>

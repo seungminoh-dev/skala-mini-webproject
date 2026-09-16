@@ -1,64 +1,74 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-import AppBar from '@/components/AppBar.vue'
-import TabBar from '@/components/TabBar.vue'
-import ComplaintCard from '@/components/ComplaintCard.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import StaffShell from '@/components/StaffShell.vue'
+import StatusMark from '@/components/StatusMark.vue'
 import { listUnassigned } from '@/mock/api'
-import { CATEGORIES } from '@/mock/constants'
+import { CATEGORIES, categoryName, priorityName } from '@/mock/constants'
 import { auth } from '@/stores/auth'
 
-const items = ref([])
-const loading = ref(true)
-const filter = ref('')
-
+const router = useRouter()
+const items = ref([]); const loading = ref(true); const filter = ref('')
 const mine = (code) => auth.state.user?.categories?.includes(code)
+const lateCount = computed(() => items.value.filter((c) => c.delayed).length)
 
 async function load() {
   loading.value = true
   items.value = await listUnassigned({ categoryCode: filter.value || null })
   loading.value = false
 }
-
-onMounted(load)
-watch(filter, load)
+onMounted(load); watch(filter, load)
 </script>
 
 <template>
-  <AppBar title="미배정 민원">
-    <template #right>
-      <button class="iconbtn" aria-label="새로고침" @click="load">⟳</button>
+  <StaffShell title="대기 중인 작업" :sub="`담당자가 정해지지 않은 요청 ${items.length}건` + (lateCount ? ` · 지연 ${lateCount}건` : '')">
+    <template #actions>
+      <button class="btn line" @click="load">새로고침</button>
     </template>
-  </AppBar>
 
-  <main class="screen">
-    <div class="chips" style="margin-bottom: 12px">
-      <button class="chip" :class="{ on: filter === '' }" @click="filter = ''">전체</button>
-      <button
-        v-for="c in CATEGORIES"
-        :key="c.code"
-        class="chip"
-        :class="{ on: filter === c.code }"
-        @click="filter = c.code"
-      >
-        {{ c.name }}<span v-if="mine(c.code)"> ·</span>
-      </button>
+    <template #toolbar>
+      <div class="toolbar">
+        <div class="filters">
+          <button class="ftog" :class="{ on: filter === '' }" @click="filter = ''">전체</button>
+          <button v-for="c in CATEGORIES" :key="c.code" class="ftog" :class="{ on: filter === c.code }" @click="filter = c.code">
+            {{ c.name }}<template v-if="mine(c.code)"> ·</template>
+          </button>
+        </div>
+        <span style="flex: 1" />
+        <span class="hint">· 는 내 담당 설비</span>
+      </div>
+    </template>
+
+    <div class="page">
+      <p v-if="loading" class="empty">불러오는 중…</p>
+      <p v-else-if="!items.length" class="empty">대기 중인 작업이 없습니다.</p>
+
+      <div v-else class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="width: 120px">상태</th>
+              <th style="width: 72px">긴급도</th>
+              <th>요청 내용</th>
+              <th style="width: 120px">설비</th>
+              <th style="width: 104px" class="right">대기</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="c in items" :key="c.id" style="cursor: pointer"
+              @click="router.push({ name: 'worker-complaint', params: { id: c.id } })">
+              <td><StatusMark :status="c.status" :late="c.delayed" /></td>
+              <td><span :class="{ urgent: c.priority === 'URGENT' }">{{ priorityName(c.priority) }}</span></td>
+              <td>
+                <div class="title">{{ c.title }}</div>
+                <div class="num">{{ c.id }} · {{ c.floor }} {{ c.space }}</div>
+              </td>
+              <td>{{ categoryName(c.categoryCode) }}</td>
+              <td class="right num nowrap">{{ c.elapsed }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-
-    <p class="hint" style="margin-bottom: 10px">
-      우선순위와 경과 시간 순으로 정렬됩니다. 담당 카테고리가 아닌 민원도 선점할 수 있습니다.
-    </p>
-
-    <p v-if="loading" class="empty">불러오는 중…</p>
-    <p v-else-if="!items.length" class="empty">미배정 민원이 없습니다.</p>
-    <div v-else class="list">
-      <ComplaintCard
-        v-for="c in items"
-        :key="c.id"
-        :complaint="c"
-        :to="{ name: 'worker-complaint', params: { id: c.id } }"
-      />
-    </div>
-  </main>
-
-  <TabBar role="WORKER" />
+  </StaffShell>
 </template>

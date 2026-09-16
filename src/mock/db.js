@@ -1,7 +1,7 @@
 // 목 데이터 저장소. 실제 구현에서는 서버 DB가 담당하는 영역이다.
 // localStorage에 유지되므로 새로고침해도 상태가 남는다. resetDb()로 초기화.
 
-const STORAGE_KEY = 'ofc-mock-db-v1'
+const STORAGE_KEY = 'ofc-mock-db-v2'
 
 const minutesAgo = (m) => new Date(Date.now() - m * 60 * 1000).toISOString()
 
@@ -22,13 +22,13 @@ export function generateComplaintId(date = new Date()) {
 
 function seedUsers() {
   return [
-    { id: 'S001', employeeNo: 'S001', password: '1234', name: '정소장', role: 'ADMIN', categories: [] },
-    { id: 'W001', employeeNo: 'W001', password: '1234', name: '김작업', role: 'WORKER', categories: ['WATER'] },
-    { id: 'W002', employeeNo: 'W002', password: '1234', name: '이시설', role: 'WORKER', categories: ['HVAC'] },
-    { id: 'W003', employeeNo: 'W003', password: '1234', name: '박전기', role: 'WORKER', categories: ['ELEC'] },
-    { id: 'W004', employeeNo: 'W004', password: '1234', name: '한배수', role: 'WORKER', categories: ['WATER'] },
+    { id: 'S001', employeeNo: 'S001', password: '1234', name: '정영배', role: 'ADMIN', categories: [] },
+    { id: 'W001', employeeNo: 'W001', password: '1234', name: '김도현', role: 'WORKER', categories: ['WATER'] },
+    { id: 'W002', employeeNo: 'W002', password: '1234', name: '이상철', role: 'WORKER', categories: ['HVAC'] },
+    { id: 'W003', employeeNo: 'W003', password: '1234', name: '박정훈', role: 'WORKER', categories: ['ELEC'] },
+    { id: 'W004', employeeNo: 'W004', password: '1234', name: '한승우', role: 'WORKER', categories: ['WATER'] },
     // 다목적 작업자 — 전 카테고리 담당 (기술서 1.1 운영 인력 구성)
-    { id: 'W005', employeeNo: 'W005', password: '1234', name: '이다목', role: 'WORKER', categories: ['ELEC', 'WATER', 'HVAC', 'ELEV', 'SEC', 'FURN'] }
+    { id: 'W005', employeeNo: 'W005', password: '1234', name: '정민수', role: 'WORKER', categories: ['ELEC', 'WATER', 'HVAC', 'ELEV', 'SEC', 'FURN'] }
   ]
 }
 
@@ -58,7 +58,7 @@ function seedComplaints() {
       resolution: null, reject: null,
       history: [
         h(minutesAgo(42), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(20), 'WORKER', '김작업', 'CLAIM')
+        h(minutesAgo(20), 'WORKER', '김도현', 'CLAIM')
       ]
     },
     {
@@ -82,8 +82,8 @@ function seedComplaints() {
       reject: null,
       history: [
         h(minutesAgo(1600), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(1520), 'WORKER', '이다목', 'CLAIM'),
-        h(minutesAgo(1460), 'WORKER', '이다목', 'COMPLETE')
+        h(minutesAgo(1520), 'WORKER', '정민수', 'CLAIM'),
+        h(minutesAgo(1460), 'WORKER', '정민수', 'COMPLETE')
       ]
     },
     {
@@ -96,7 +96,7 @@ function seedComplaints() {
       resolution: null, reject: null,
       history: [
         h(minutesAgo(300), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(90), 'WORKER', '박전기', 'CLAIM')
+        h(minutesAgo(90), 'WORKER', '박정훈', 'CLAIM')
       ]
     },
     {
@@ -119,7 +119,7 @@ function seedComplaints() {
       resolution: null, reject: null,
       history: [
         h(minutesAgo(180), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(150), 'WORKER', '이다목', 'CLAIM')
+        h(minutesAgo(150), 'WORKER', '정민수', 'CLAIM')
       ]
     },
     {
@@ -133,8 +133,8 @@ function seedComplaints() {
       reject: null,
       history: [
         h(minutesAgo(1800), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(1700), 'WORKER', '이시설', 'CLAIM'),
-        h(minutesAgo(1640), 'WORKER', '이시설', 'COMPLETE')
+        h(minutesAgo(1700), 'WORKER', '이상철', 'CLAIM'),
+        h(minutesAgo(1640), 'WORKER', '이상철', 'COMPLETE')
       ]
     },
     {
@@ -148,7 +148,7 @@ function seedComplaints() {
       reject: { reasonType: 'DUPLICATE', reason: '동일 위치·동일 증상 민원이 이미 접수되어 있습니다.', originalComplaintId: 'M-260915-A7K2Q9', at: minutesAgo(1380) },
       history: [
         h(minutesAgo(1400), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(1380), 'ADMIN', '정소장', 'REJECT', '중복 민원 — 원본 M-260915-A7K2Q9')
+        h(minutesAgo(1380), 'ADMIN', '정영배', 'REJECT', '같은 건 — 원본 M-260915-A7K2Q9')
       ]
     },
     {
@@ -162,8 +162,8 @@ function seedComplaints() {
       reject: null,
       history: [
         h(minutesAgo(3000), 'USER', '신고자', 'REGISTER'),
-        h(minutesAgo(2900), 'WORKER', '박전기', 'CLAIM'),
-        h(minutesAgo(2810), 'WORKER', '박전기', 'COMPLETE')
+        h(minutesAgo(2900), 'WORKER', '박정훈', 'CLAIM'),
+        h(minutesAgo(2810), 'WORKER', '박정훈', 'COMPLETE')
       ]
     },
     {

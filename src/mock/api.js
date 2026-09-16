@@ -43,9 +43,9 @@ export function isDelayed(c) {
 export function elapsedLabel(iso) {
   const m = minutesSince(iso)
   if (m < 1) return '방금'
-  if (m < 60) return `${m}분`
+  if (m < 60) return `${m}분 전`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}시간 ${m % 60}분`
+  if (h < 24) return `${h}시간 ${m % 60}분 전`
   const d = Math.floor(h / 24)
   return d === 1 ? '어제' : `${d}일 전`
 }
@@ -208,7 +208,7 @@ export async function claimComplaint(id, workerId) {
   c.assigneeId = workerId
   c.assignedAt = nowIso()
   const offCategory = w && w.categories.length > 0 && !w.categories.includes(c.categoryCode)
-  pushHistory(c, 'WORKER', w?.name ?? workerId, 'CLAIM', offCategory ? '담당 외 카테고리' : null)
+  pushHistory(c, 'WORKER', w?.name ?? workerId, 'CLAIM', offCategory ? '담당 외 설비' : null)
   persist()
   return decorate(c)
 }

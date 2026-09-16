@@ -2,14 +2,14 @@ const ACTION_LABEL = {
   REGISTER: '민원 접수',
   UPDATE: '신고 내용 수정',
   CANCEL: '신고자 취소',
-  CLAIM: '작업자 선점',
-  RELEASE: '작업자 반납',
+  CLAIM: '담당 기사 배정',
+  RELEASE: '작업 넘김',
   COMPLETE: '처리 완료',
-  ASSIGN: '관리소장 배정',
-  REASSIGN: '관리소장 재배정',
-  REVOKE: '관리소장 배정 회수',
-  UPDATE_CLASSIFICATION: '분류 정보 수정',
-  REJECT: '관리소장 반려'
+  ASSIGN: '관리소장이 담당자 지정',
+  REASSIGN: '담당자 변경',
+  REVOKE: '담당 해제',
+  UPDATE_CLASSIFICATION: '요청 정보 정정',
+  REJECT: '반려'
 }
 
 export const actionLabel = (a) => ACTION_LABEL[a] ?? a

@@ -1,94 +1,80 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import AppBar from '@/components/AppBar.vue'
-import TabBar from '@/components/TabBar.vue'
+import StaffShell from '@/components/StaffShell.vue'
 import { getStats } from '@/mock/api'
 import { categoryName } from '@/mock/constants'
 import { durationLabel } from '@/utils/format'
 
-const from = ref('')
-const to = ref('')
-const stats = ref(null)
-const loading = ref(true)
-
-async function load() {
-  loading.value = true
-  stats.value = await getStats({ from: from.value || null, to: to.value || null })
-  loading.value = false
-}
-
+const from = ref(''); const to = ref(''); const s = ref(null); const loading = ref(true)
+async function load() { loading.value = true; s.value = await getStats({ from: from.value || null, to: to.value || null }); loading.value = false }
 onMounted(load)
 
-const maxCategory = computed(() => Math.max(1, ...(stats.value?.byCategory ?? []).map((r) => r.count)))
-const maxFloor = computed(() => Math.max(1, ...(stats.value?.byFloor ?? []).map((r) => r.count)))
+function rows(list, nameFn) {
+  const max = Math.max(1, ...list.map((r) => r.count))
+  const sum = list.reduce((a, r) => a + r.count, 0) || 1
+  return list.map((r, i) => ({
+    key: r.key, name: nameFn(r.key), count: r.count,
+    pct: Math.round((r.count / sum) * 1000) / 10,
+    w: (r.count / max) * 100, top: i === 0
+  }))
+}
+const byCategory = computed(() => rows(s.value?.byCategory ?? [], categoryName))
+const byFloor = computed(() => rows(s.value?.byFloor ?? [], (k) => k))
 </script>
 
 <template>
-  <AppBar title="민원 통계">
-    <template #right>
-      <button class="iconbtn" aria-label="새로고침" @click="load">⟳</button>
+  <StaffShell title="통계" sub="정기 정비를 요청할 때 근거로 씁니다">
+    <template #toolbar>
+      <div class="toolbar">
+        <input v-model="from" type="date" class="input" style="max-width: 158px" />
+        <span class="hint">—</span>
+        <input v-model="to" type="date" class="input" style="max-width: 158px" />
+        <button class="btn line" @click="load">적용</button>
+        <span style="flex: 1" />
+        <span class="hint">기간을 비우면 전체 누적</span>
+      </div>
     </template>
-  </AppBar>
 
-  <main class="screen">
-    <div class="row2" style="margin-bottom: 8px">
-      <input v-model="from" type="date" class="input" />
-      <input v-model="to" type="date" class="input" />
+    <div class="page">
+      <p v-if="loading" class="empty">불러오는 중…</p>
+
+      <template v-else-if="s">
+        <div class="metrics">
+          <div class="metric"><div class="k">총 접수</div><div class="n">{{ s.total }}<small>건</small></div></div>
+          <div class="metric"><div class="k">처리 완료</div><div class="n">{{ s.completed }}<small>건</small></div></div>
+          <div class="metric"><div class="k">평균 처리 시간</div><div class="n" style="font-size: 23px">{{ durationLabel(s.avgMinutes) }}</div></div>
+          <div class="metric"><div class="k">반려율</div><div class="n">{{ s.rejectRate }}<small>%</small></div></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 44px; margin-top: 40px; align-items: start">
+          <section>
+            <p class="sect">설비별 발생 건수</p>
+            <p v-if="!byCategory.length" class="hint">데이터가 없습니다.</p>
+            <div v-else class="bars">
+              <div v-for="r in byCategory" :key="r.key" class="bar" :class="{ top: r.top }">
+                <span class="nm">{{ r.name }}</span>
+                <span class="track"><span class="fill" :style="{ width: `${r.w}%` }" /></span>
+                <span class="vl">{{ r.count }}<span>{{ r.pct }}%</span></span>
+              </div>
+            </div>
+            <p v-if="byCategory.length" class="hint" style="margin-top: 14px">
+              <b style="color: var(--ink)">{{ byCategory[0].name }}</b> — 전체의 {{ byCategory[0].pct }}%. 정기 정비 대상 1순위.
+            </p>
+          </section>
+
+          <section>
+            <p class="sect">층별 발생 건수</p>
+            <p v-if="!byFloor.length" class="hint">데이터가 없습니다.</p>
+            <div v-else class="bars">
+              <div v-for="r in byFloor" :key="r.key" class="bar" :class="{ top: r.top }">
+                <span class="nm">{{ r.name }}</span>
+                <span class="track"><span class="fill" :style="{ width: `${r.w}%` }" /></span>
+                <span class="vl">{{ r.count }}<span>{{ r.pct }}%</span></span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </template>
     </div>
-    <button class="btn ghost" style="margin-bottom: 16px" @click="load">기간 적용</button>
-
-    <p v-if="loading" class="empty">불러오는 중…</p>
-
-    <template v-else-if="stats">
-      <div class="metrics">
-        <div class="metric">
-          <div class="k">총 접수</div>
-          <div class="n">{{ stats.total }}건</div>
-        </div>
-        <div class="metric">
-          <div class="k">평균 처리 시간</div>
-          <div class="n" style="font-size: 20px">{{ durationLabel(stats.avgMinutes) }}</div>
-        </div>
-        <div class="metric">
-          <div class="k">반려율</div>
-          <div class="n">{{ stats.rejectRate }}%</div>
-        </div>
-        <div class="metric">
-          <div class="k">처리 완료</div>
-          <div class="n">{{ stats.completed }}건</div>
-        </div>
-      </div>
-
-      <div class="cols" style="margin-top: 18px">
-        <section>
-          <div class="section-title" style="margin-top: 0">카테고리별 발생 건수</div>
-          <div class="card">
-            <p v-if="!stats.byCategory.length" class="hint">데이터가 없습니다.</p>
-            <div v-for="r in stats.byCategory" v-else :key="r.key" class="bar-row">
-              <span class="name">{{ categoryName(r.key) }}</span>
-              <span class="track"><span class="fill" :style="{ width: `${(r.count / maxCategory) * 100}%` }" /></span>
-              <span class="n">{{ r.count }}</span>
-            </div>
-          </div>
-        </section>
-        <section>
-          <div class="section-title" style="margin-top: 0">위치별 발생 건수</div>
-          <div class="card">
-            <p v-if="!stats.byFloor.length" class="hint">데이터가 없습니다.</p>
-            <div v-for="r in stats.byFloor" v-else :key="r.key" class="bar-row">
-              <span class="name">{{ r.key }}</span>
-              <span class="track"><span class="fill" :style="{ width: `${(r.count / maxFloor) * 100}%` }" /></span>
-              <span class="n">{{ r.count }}</span>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <p class="hint" style="margin-top: 14px">
-        정기 정비 요청의 근거 자료로 사용합니다. (AS-01)
-      </p>
-    </template>
-  </main>
-
-  <TabBar role="ADMIN" />
+  </StaffShell>
 </template>

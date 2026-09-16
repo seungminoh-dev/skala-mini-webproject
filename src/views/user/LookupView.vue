@@ -1,34 +1,26 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import AppBar from '@/components/AppBar.vue'
-import TabBar from '@/components/TabBar.vue'
+import PubShell from '@/components/PubShell.vue'
 
-const router = useRouter()
-const code = ref('')
-
-function go() {
-  const id = code.value.trim().toUpperCase()
-  if (!id) return
-  router.push({ name: 'complaint', params: { id } })
-}
+const router = useRouter(); const code = ref('')
+const go = () => { const id = code.value.trim().toUpperCase(); if (id) router.push({ name: 'complaint', params: { id } }) }
 </script>
 
 <template>
-  <AppBar title="민원 조회" :back="{ path: '/' }" />
-
-  <main class="screen narrow">
-    <h2 style="font-size: 19px; margin: 8px 0 6px">민원 번호를 입력하세요</h2>
-    <p class="hint" style="margin-bottom: 16px">접수 완료 화면에서 발급된 번호를 입력합니다.</p>
-
-    <input v-model="code" class="input" placeholder="예: M-260915-A7K2Q9" @keyup.enter="go" />
-    <button class="btn" style="margin-top: 10px" @click="go">조회하기</button>
-
-    <div class="notice info" style="margin-top: 16px">
-      <strong>공개 조회 안내</strong><br />
-      상태와 처리 이력은 비밀번호 없이 확인할 수 있습니다. 수정과 취소에만 비밀번호가 필요합니다.
+  <PubShell narrow>
+    <div style="padding: 64px 0 28px">
+      <p class="eyebrow">접수 내역 조회</p>
+      <h1 class="display" style="font-size: 30px; margin-top: 10px">민원 번호를 입력하세요</h1>
     </div>
-  </main>
 
-  <TabBar role="USER" />
+    <input v-model="code" class="input mono" style="font-size: 17px; padding: 13px" placeholder="M-260915-A7K2Q9" @keyup.enter="go" />
+    <button class="btn lg wide" style="margin-top: 10px" @click="go">조회하기</button>
+
+    <div class="note" style="margin-top: 22px">
+      <strong>비밀번호 없이 볼 수 있습니다.</strong><br />
+      처리 상황을 확인하려는 사람에게 다시 관문을 두지 않기 위해서입니다.
+      신고자 이름·연락처 같은 개인 정보는 처음부터 수집하지 않습니다.
+    </div>
+  </PubShell>
 </template>
