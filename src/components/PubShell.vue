@@ -8,7 +8,6 @@ defineProps({ narrow: { type: Boolean, default: false } })
       <router-link to="/" class="wordmark">FMS</router-link>
       <span class="bld">판교 오피스 B동</span>
       <span class="grow" />
-      <span class="bld" style="border: 0; padding: 0">관리실 <b class="mono" style="color: #fff">02-3456-7800</b></span>
       <router-link to="/">처음으로</router-link>
       <router-link to="/staff/login">직원 로그인</router-link>
     </header>

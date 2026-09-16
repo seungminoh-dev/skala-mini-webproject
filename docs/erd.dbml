@@ -129,7 +129,7 @@ Table complaint {
   assignee_id   varchar(20)        [null, ref: > user_account.id, note: 'RECEIVED 상태에서는 NULL']
 
   resolution_content  text [null, note: '조치 내용. COMPLETED 일 때만 존재']
-  resolution_minutes  int  [null, note: '소요 시간(분)']
+  // 처리 시간은 저장하지 않는다 — completed_at - created_at 으로 산출한다 (P-G)
 
   rejection_type        rejection_type [null]
   rejection_reason      text           [null]

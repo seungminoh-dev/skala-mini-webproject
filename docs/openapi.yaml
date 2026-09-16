@@ -95,7 +95,7 @@ paths:
         |---|---|
         | 미배정 민원 (W-02) | `status=RECEIVED` |
         | 내 작업 (W-05) | `assignee=me&status=IN_PROGRESS` |
-        | 전체 민원 (A-02) | 조건 없음 또는 필터 조합 |
+        | 전체 민원 (A-02) | 조건 없음 또는 필터 조합 (상태·설비·층·긴급도·담당자·기간·지연·검색어) |
         | 지연 민원 (A-01) | `status=RECEIVED&delayed=true` |
 
         **직원 전용이다.** 신고자는 민원 번호로 단건 조회만 할 수 있다.
@@ -125,6 +125,14 @@ paths:
           in: query
           description: 선점 대기 시간이 우선순위별 임계값(긴급 1시간 / 보통 6시간 / 낮음 24시간)을 초과한 건만 조회
           schema: { type: boolean }
+        - name: from
+          in: query
+          description: 접수일 시작 (미지정 시 제한 없음)
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          description: 접수일 종료 (해당 일자 포함)
+          schema: { type: string, format: date }
         - name: keyword
           in: query
           description: 제목 또는 민원 번호 부분 일치
@@ -404,7 +412,8 @@ paths:
       tags: [Worker]
       summary: 처리 결과 등록
       description: |
-        FR-205. 조치 내용·사진·소요 시간을 기록하고 `COMPLETED` 로 전환한다.
+        FR-205. 조치 내용·사진을 기록하고 `COMPLETED` 로 전환한다.
+        소요 시간은 입력받지 않고 배정~완료 간격으로 산출해 응답에 포함한다 (P-G).
         신고자의 확인 단계를 두지 않으므로 이 상태가 최종이다.
       operationId: completeComplaint
       requestBody:
@@ -522,7 +531,13 @@ paths:
       description: |
         FR-306. 배정을 해제해 `RECEIVED` 로 되돌린다.
         배정(assignment)을 민원의 하위 리소스로 보고 그 삭제로 표현한다.
+        회수 사유는 선택이며, DELETE 본문이 보장되지 않으므로 쿼리로 받아 처리 이력에 남긴다.
       operationId: revokeAssignment
+      parameters:
+        - name: note
+          in: query
+          description: 회수 사유. 선택 입력이며 처리 이력에 기록된다.
+          schema: { type: string, maxLength: 255 }
       responses:
         '200':
           description: 회수됨
@@ -887,10 +902,11 @@ components:
             resolution:
               type: object
               nullable: true
-              description: 상태가 COMPLETED 일 때만 존재한다.
+              description: |
+                상태가 COMPLETED 일 때만 존재한다.
+                처리 시간은 따로 담지 않는다 — `completedAt - createdAt` 하나로 말한다 (P-G).
               properties:
                 content: { type: string, example: 배수 트랩 패킹 교체 완료. 누수 없음 확인. }
-                durationMinutes: { type: integer, example: 45 }
                 completedAt: { type: string, format: date-time }
             rejection:
               type: object
@@ -984,9 +1000,10 @@ components:
     CompletionRequest:
       type: object
       required: [content]
+      description: |
+        소요 시간은 받지 않는다. 서버가 `completedAt - assignedAt` 으로 산출한다 (P-G).
       properties:
         content: { type: string, description: 조치 내용. 필수., example: 배수 트랩 패킹 교체 완료. }
-        durationMinutes: { type: integer, minimum: 0, example: 45 }
         photoUrls:
           type: array
           items: { type: string, format: uri }
@@ -1057,6 +1074,20 @@ components:
           type: integer
           description: 현재 보유 중인 처리중 민원 수
           example: 2
+        current:
+          type: array
+          description: |
+            현재 맡고 있는 민원 (맡은 순). A-01 기사 현황과 A-04 배정 화면이
+            "지금 누가 무엇을 하는지"를 판단 근거로 쓴다.
+          items:
+            type: object
+            properties:
+              id: { type: string, example: M-260915-A7K2Q9 }
+              title: { type: string, example: 6층 화장실 세면대 누수 }
+              floorNo: { type: integer, example: 6 }
+              space:
+                $ref: '#/components/schemas/SpaceType'
+              assignedAt: { type: string, format: date-time }
 
     DashboardResponse:
       type: object
@@ -1083,9 +1114,10 @@ components:
       properties:
         total: { type: integer, example: 37 }
         completed: { type: integer, example: 24 }
+        rejected: { type: integer, example: 3 }
         avgMinutes:
           type: integer
-          description: 접수부터 처리 완료까지의 평균 소요 시간(분)
+          description: 접수부터 처리 완료까지의 평균 처리 시간(분)
           example: 163
         rejectRate:
           type: number

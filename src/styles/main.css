@@ -169,8 +169,15 @@ h1, h2, h3, p { margin: 0; }
 .pub-top a { font-size: 12.5px; color: var(--on-navy-dim); }
 .pub-top a:hover, .pub-top a.active { color: #fff; }
 
-.pub { flex: 1; padding: 0 32px 40px; display: flex; align-items: center; }
+/* 본문은 상단에서 시작한다 — 내용량에 따라 시작점이 흔들리지 않게 (개편 기획 4.3) */
+.pub { flex: 1; padding: 40px 32px 56px; }
 .pub > .pub-inner { width: 100%; }
+/* USER 화면은 접수 창구다 — 본문·입력 16px 기준, 조작 영역을 크게 (개편 기획 4.2) */
+.pub { font-size: 15.5px; }
+.pub .input, .pub .select, .pub .textarea { font-size: 16px; padding: 11px 12px; }
+.pub .label { font-size: 14.5px; }
+.pub .hint { font-size: 13.5px; }
+.pub .btn.lg { padding: 13px 26px; font-size: 16px; }
 .pub-top .bld { font-size: 12.5px; color: var(--on-navy-dim); padding-left: 14px; border-left: 1px solid rgba(255,255,255,.18); }
 .pub-foot { border-top: 1px solid var(--line); background: var(--surface); padding: 14px 32px; font-size: 12px; color: var(--muted); }
 .pub-foot .pub-inner { display: flex; gap: 22px; flex-wrap: wrap; align-items: center; }
@@ -321,6 +328,46 @@ h1, h2, h3, p { margin: 0; }
 .backlink { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .backlink:hover { color: var(--blue); }
 
+/* ── USER 개편 (기획서 2026-09-16) ───────────────────── */
+
+/* 필수 표식 — 흐린 작은 글씨로 숨기지 않는다 */
+.req::after { content: ' *'; color: var(--alert); font-weight: 700; }
+.ferr { color: var(--alert); font-size: 13px; margin-top: 6px; }
+.input.invalid, .select.invalid, .textarea.invalid { border-color: var(--alert); }
+
+/* 폼 묶음 제목 */
+.fgroup { margin-top: 34px; }
+.fgroup:first-child { margin-top: 0; }
+.fgroup > .gt { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: var(--blue);
+                padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+
+/* 접수증 — 흰 면을 쓰는 대표 영역 */
+.receipt { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r); padding: 26px 28px; }
+.receipt .rk { font-size: 12px; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; }
+
+.btn.sm { padding: 6px 12px; font-size: 13px; }
+
+/* 사진 목록 */
+.filelist { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.filelist .f { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line);
+               border-radius: var(--r); background: var(--surface); padding: 7px 10px; font-size: 13px; }
+.filelist .f .fx-del { margin-left: auto; border: 0; background: none; color: var(--muted); font-size: 15px; padding: 0 4px; }
+.filelist .f .fx-del:hover { color: var(--alert); }
+
+/* 홈 이분할 — 카드 두 장 대신 하나의 구분선 */
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 48px; margin-top: 36px; }
+.home-grid > .hcol + .hcol { border-left: 1px solid var(--line-2); padding-left: 48px; }
+.home-grid .ht { font-size: 18px; font-weight: 700; color: var(--ink); }
+.home-grid .hd { color: var(--muted); margin-top: 6px; font-size: 14.5px; }
+@media (max-width: 900px) {
+  .home-grid { grid-template-columns: 1fr; gap: 28px 0; }
+  .home-grid > .hcol + .hcol { border-left: 0; padding-left: 0; border-top: 1px solid var(--line-2); padding-top: 28px; }
+}
+
+/* 조회 입력 + 버튼이 하나의 조작 단위 */
+.lookup-row { display: flex; gap: 8px; }
+.lookup-row .input { flex: 1; }
+
 /* 신고자 상세 — 상태를 문장으로 크게 말한다. 인디케이터는 채움 방식으로 구분. */
 .shero { display: flex; align-items: center; gap: 11px; }
 .shero i { width: 11px; height: 11px; border-radius: 1px; flex: none; }
@@ -414,6 +461,160 @@ h1, h2, h3, p { margin: 0; }
   .pub, .pub-top { padding-left: 18px; padding-right: 18px; }
   .display { font-size: 30px; }
 }
+
+/* ── WORKER 개편 (기획서 2026-09-16) ─────────────────── */
+
+/* 내용 폭 상한 — 상세·폼이 넓은 화면에서 늘어나기만 하는 것을 막는다 (WX-26).
+   테이블 화면은 전폭을 유지하므로 쓰지 않는다. */
+.page-narrow { max-width: 1100px; }
+.wcols { display: grid; grid-template-columns: minmax(0, 720px) 320px; gap: 44px; align-items: start; }
+.wcols-r { grid-template-columns: 320px minmax(0, 720px); }  /* 근거를 왼쪽에 두는 결정 화면 */
+@media (max-width: 1000px) {
+  .wcols, .wcols-r { grid-template-columns: 1fr; gap: 30px; }
+  .wcols-r > aside { order: 2; }
+}
+
+/* 행동 피드백 한 줄 — 새로고침하면 사라진다 (WX-21) */
+.shell-note { margin: 18px 28px 0; }
+
+/* 상세 머리 — 제목이 가장 크고, 나머지는 한 줄 메타로 (WX-06) */
+.whead { padding-bottom: 18px; border-bottom: 1px solid var(--line-2); }
+.whead .wt { font-size: 24px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 10px 0 0; }
+.wmeta { margin-top: 9px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 9px;
+         font-size: 13.5px; color: var(--muted); }
+.wmeta .place { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+.wmeta .sep { color: var(--line-2); }
+
+/* 목록 열 폭 — 요청 내용이 남는 폭을 다 먹지 않게 하고 남는 폭은 오른쪽 여백으로 (WX-25).
+   ADMIN 테이블과 공유하지 않으려고 .tbl-w 안에서만 적용한다. */
+.tbl-w { table-layout: fixed; }
+.tbl-w .c-pri { width: 132px; }  /* 긴급도 + 지연 마커 */
+.tbl-w .c-loc { width: 140px; }
+.tbl-w .c-req { width: 480px; }
+.tbl-w .c-cat { width: 118px; }
+.tbl-w .c-at  { width: 122px; }
+.tbl-w .c-when { width: 152px; }  /* 완료 시각 */
+.tbl-w .c-st  { width: 118px; }
+.tbl-w .c-who { width: 96px; }
+.tbl-w .c-nm  { width: 140px; }  /* 기사 이름 — 좁은 화면에서도 남긴다 */
+.tbl-w .c-hold { width: 68px; font-weight: 700; color: var(--ink); }
+/* 관리소장 대장은 상태 열이 지연까지 말하므로 긴급도 열을 좁게 쓴다 */
+.tbl-w.tbl-adm .c-pri { width: 76px; }
+.tbl-w .c-act { width: 132px; }
+.tbl-w .c-sum { width: auto; }   /* 마지막 열 — 남는 폭을 요약 글이 받는다 */
+.tbl-w .c-gap { width: auto; }
+.tbl-w .place { font-weight: 700; color: var(--ink); }
+.tbl-w .ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tbl-w .rsub, .tbl-w .rloc { display: none; }
+.tbl-w tbody tr.click { cursor: pointer; }
+/* 지연은 상태 열을 따로 두지 않고 긴급도 옆 마커로 말한다 (WX-03) */
+.late-mark { display: inline-flex; align-items: center; gap: 5px; margin-left: 7px;
+             font-size: 12px; font-weight: 700; color: var(--alert); white-space: nowrap; }
+.late-mark i { width: 8px; height: 8px; border-radius: 1px; background: var(--alert); flex: none; }
+
+/* 정렬 선택 — 넓은 화면은 토글, 좁은 화면은 드롭다운 */
+.sortbox { display: flex; align-items: center; gap: 8px; }
+.sortbox .sk { font-size: 12px; color: var(--muted); }
+.only-narrow { display: none; }
+
+/* 처리 결과 폼 — 정형 조치 선택지는 사각 토글을 크게 (4.2 폼 규칙) */
+.choices { display: flex; flex-wrap: wrap; gap: 7px; }
+.choices .ftog { padding: 9px 14px; font-size: 13.5px; }
+.formfoot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line-2); }
+
+/* 보조 열 — 원문을 옆에 두고 일지를 쓴다 (WX-16) */
+.aside-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; }
+.aside-box + .aside-box { margin-top: 14px; }
+.aside-box .ak { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--muted); }
+.aside-box .av { font-size: 13.5px; line-height: 1.7; color: var(--text); margin-top: 6px; white-space: pre-wrap; }
+
+@media (max-width: 900px) {
+  .shell-note { margin: 14px 18px 0; }
+}
+
+/* 좁은 화면에서는 긴급도·위치·요청 내용만 남기고 나머지는 행 부제로 내린다 (WX-23) */
+@media (max-width: 720px) {
+  .tbl-w { table-layout: auto; }
+  /* 위치도 열에서 내려 제목 위 굵은 줄로 붙인다 — 390px 에서 세 열은 제목이 깨진다 */
+  .tbl-w .c-cat, .tbl-w .c-at, .tbl-w .c-when, .tbl-w .c-loc,
+  .tbl-w .c-who, .tbl-w .c-act, .tbl-w .c-sum, .tbl-w .c-gap { display: none; }
+  .tbl-w .rsub { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .tbl-w .rloc { display: block; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .tbl-w .c-pri { width: 76px; white-space: normal; }
+  .tbl-w .late-mark { margin-left: 0; }
+  .tbl-w .c-req { width: auto; }
+  .tbl-w .ell { white-space: normal; }
+  .only-wide { display: none; }
+  .only-narrow { display: flex; }
+  .whead .wt { font-size: 20px; }
+}
+
+/* ── ADMIN 개편 (기획서 2026-09-16) ──────────────────── */
+
+/* 행동은 뷰포트 우상단이 아니라 대상이 있는 제목 블록 우측에 (AX-31) */
+.whead-row { display: flex; align-items: flex-end; gap: 20px; }
+.whead-row > div:first-child { flex: 1; min-width: 0; }
+@media (max-width: 760px) {
+  .whead-row { flex-direction: column; align-items: stretch; gap: 14px; }
+}
+
+/* 보조 행동은 접어 둔다 — 항상 열려 있는 편집 폼을 두지 않는다 (AX-14, AX-17) */
+.fold { border-top: 1px solid var(--line-2); }
+.fold-h {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  background: none; border: 0; padding: 13px 0;
+  font-size: 13.5px; font-weight: 700; color: var(--ink); text-align: left;
+}
+.fold-h:hover { color: var(--blue); }
+.fold-h .fold-m { margin-left: auto; font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.fold-b { padding: 4px 0 20px; }
+
+/* 배정 모달 — 담당 설비가 일치하는 기사에 표식 (AX-20) */
+.tbl .title .match { color: var(--sky); font-size: 10px; margin-left: 5px; vertical-align: middle; }
+.tbl tbody tr.off { background: var(--panel); color: var(--muted); }
+.tbl tbody tr.off:hover { background: var(--panel); }
+
+/* 현황판 — 큰 숫자는 한 화면에 하나뿐이다 (AX-08) */
+.head-line { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.head-line .hl-t { font-size: 17px; font-weight: 700; color: var(--ink); }
+.head-line .hl-t.alert { color: var(--alert); }
+.head-line .hl-n { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; color: var(--ink); }
+.head-line .hl-n.alert { color: var(--alert); }
+.head-line .grow { flex: 1; }
+.head-line a { font-size: 13px; font-weight: 600; color: var(--blue); }
+.head-line a:hover { text-decoration: underline; }
+
+/* 서브타이틀 안의 사실 숫자는 눌러서 대장으로 내려간다 */
+.sub .factlink { color: var(--blue); font-weight: 600; }
+.sub .factlink:hover { text-decoration: underline; }
+
+/* 대장 — 조건을 걸어 찾는다. 조건이 무엇인지 항상 보인다 (AX-03, AX-06) */
+.fbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.fbar + .fbar { margin-top: 8px; }
+.fgrp { display: flex; align-items: center; gap: 7px; }
+.fgrp > .fk { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); white-space: nowrap; }
+.fgrp .select { width: auto; min-width: 110px; padding: 5px 9px; font-size: 12.5px; }
+.fgrp .input[type='date'] { width: auto; padding: 4px 8px; font-size: 12.5px; }
+.fswitch { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+.fswitch input { width: 14px; height: 14px; accent-color: var(--navy); }
+.summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+  padding: 10px 28px; background: var(--panel); border-bottom: 1px solid var(--line);
+  font-size: 12.5px; color: var(--text);
+}
+.summary b { color: var(--ink); font-weight: 700; }
+.summary .cond { color: var(--muted); }
+.summary .grow { flex: 1; }
+
+/* 통계 — 큰 숫자 하나 + 문장 안의 숫자 (AX-27) */
+.statline { font-size: 14.5px; color: var(--text); }
+.statline .big { font-family: var(--mono); font-size: 36px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+.statline b { color: var(--ink); font-weight: 700; }
+button.bar { border: 0; background: none; padding: 0; width: 100%; text-align: left; font: inherit; }
+.bar.link { cursor: pointer; }
+.bar.link:hover .fill { background: var(--navy); }
+.bar.link:hover .nm { color: var(--blue); font-weight: 600; }
 
 .devbar {
   position: fixed; right: 14px; bottom: 14px; z-index: 50;

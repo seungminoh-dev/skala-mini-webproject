@@ -37,6 +37,24 @@ export const DELAY_THRESHOLD_MINUTES = {
   LOW: 1440
 }
 
+// 처리 결과의 정형 조치. 탭 한 번으로 필수 항목을 채우기 위한 목록이다 (P-H).
+// 자유 서술(메모)은 선택이며, 저장 시 `선택지 — 메모` 로 합쳐 resolution.content 에 들어간다.
+export const RESOLUTION_ACTIONS = [
+  '부품 교체',
+  '조정·재설정',
+  '청소·이물 제거',
+  '확인 결과 이상 없음',
+  '임시 조치 · 후속 필요'
+]
+
+// 분류 정보 항목의 표시 이름. 이력 note 에 내부 필드명을 남기지 않는다 (AX-18).
+export const CLASSIFICATION_FIELDS = {
+  floor: '층',
+  space: '공간',
+  categoryCode: '설비',
+  priority: '긴급도'
+}
+
 export const REJECT_REASONS = [
   { code: 'DUPLICATE', name: '중복 민원' },
   { code: 'OUT_OF_SCOPE', name: '관리 대상 외' },
