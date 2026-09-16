@@ -9,8 +9,8 @@ import { auth } from './stores/auth'
 if (import.meta.env.DEV) {
   const role = new URLSearchParams(location.search).get('devrole')
   const preset = {
-    ADMIN: { id: 'S001', name: '정소장', role: 'ADMIN', categories: [] },
-    WORKER: { id: 'W001', name: '김작업', role: 'WORKER', categories: ['WATER'] }
+    ADMIN: { id: 'S001', name: '정영배', role: 'ADMIN', categories: [] },
+    WORKER: { id: 'W001', name: '김도현', role: 'WORKER', categories: ['WATER'] }
   }[role]
   if (preset) auth.setUser(preset)
 }

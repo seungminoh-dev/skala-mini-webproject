@@ -2,7 +2,7 @@
 // 상태 전이 규칙(9.2), 선점 정책(9.3), 중복 처리(9.4)를 이 계층에서 강제한다.
 
 import { db, persist, generateComplaintId, resetDb } from './db'
-import { DELAY_THRESHOLD_MINUTES } from './constants'
+import { CLASSIFICATION_FIELDS, DELAY_THRESHOLD_MINUTES } from './constants'
 
 export class ApiError extends Error {
   constructor(status, code, message) {
@@ -43,11 +43,31 @@ export function isDelayed(c) {
 export function elapsedLabel(iso) {
   const m = minutesSince(iso)
   if (m < 1) return '방금'
-  if (m < 60) return `${m}분`
+  if (m < 60) return `${m}분 전`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}시간 ${m % 60}분`
+  if (h < 24) return `${h}시간 ${m % 60}분 전`
   const d = Math.floor(h / 24)
   return d === 1 ? '어제' : `${d}일 전`
+}
+
+// 보유 건수만으로는 "지금 무엇을 하는지"를 알 수 없다. 맡은 순으로 현재 작업을 함께 준다 (P-C).
+function currentTasks(workerId) {
+  return db.complaints
+    .filter((c) => c.status === 'IN_PROGRESS' && c.assigneeId === workerId)
+    .sort((a, b) => new Date(a.assignedAt) - new Date(b.assignedAt))
+    .map((c) => ({ id: c.id, title: c.title, floor: c.floor, space: c.space, assignedAt: c.assignedAt }))
+}
+
+// 같은 층·공간·설비의 미종료 민원. 중복 판단의 근거이자 반려 원본 후보다.
+function relatedActiveOf(c) {
+  return db.complaints.filter(
+    (x) =>
+      x.id !== c.id &&
+      x.floor === c.floor &&
+      x.space === c.space &&
+      x.categoryCode === c.categoryCode &&
+      ['RECEIVED', 'IN_PROGRESS'].includes(x.status)
+  )
 }
 
 function decorate(c) {
@@ -177,22 +197,29 @@ export async function listUnassigned({ categoryCode = null } = {}) {
     })
 }
 
+// GET /complaints/{id} + GET /complaints/{id}/related — FR-301·FR-308
+// 관리소장 상세는 중복 판단(같은 위치)과 반려 원본을 함께 본다.
+export async function getAdminComplaint(id) {
+  await delay()
+  const c = find(id)
+  const original = c.reject?.originalComplaintId
+    ? db.complaints.find((x) => x.id === c.reject.originalComplaintId)
+    : null
+  return {
+    ...decorate(c),
+    relatedActive: relatedActiveOf(c).map(decorate),
+    originalComplaint: original
+      ? { id: original.id, title: original.title, status: original.status }
+      : null
+  }
+}
+
 // GET /complaints/{id} + GET /complaints/{id}/related — FR-206
 // 동일 위치·카테고리의 진행 중 민원을 함께 반환한다 (AS-04 사후 정리 근거).
 export async function getWorkerComplaint(id) {
   await delay()
   const c = find(id)
-  const related = db.complaints
-    .filter(
-      (x) =>
-        x.id !== c.id &&
-        x.floor === c.floor &&
-        x.space === c.space &&
-        x.categoryCode === c.categoryCode &&
-        ['RECEIVED', 'IN_PROGRESS'].includes(x.status)
-    )
-    .map(decorate)
-  return { ...decorate(c), relatedActive: related }
+  return { ...decorate(c), relatedActive: relatedActiveOf(c).map(decorate) }
 }
 
 // POST /complaints/{id}/claim — FR-202
@@ -208,13 +235,14 @@ export async function claimComplaint(id, workerId) {
   c.assigneeId = workerId
   c.assignedAt = nowIso()
   const offCategory = w && w.categories.length > 0 && !w.categories.includes(c.categoryCode)
-  pushHistory(c, 'WORKER', w?.name ?? workerId, 'CLAIM', offCategory ? '담당 외 카테고리' : null)
+  pushHistory(c, 'WORKER', w?.name ?? workerId, 'CLAIM', offCategory ? '담당 외 설비' : null)
   persist()
   return decorate(c)
 }
 
 // POST /complaints/{id}/release — FR-203
-export async function releaseComplaint(id, workerId) {
+// note 는 선택 입력이다. 관리소장이 재배정을 판단할 때 쓰는 근거로 이력에 남는다 (P-A).
+export async function releaseComplaint(id, workerId, note = null) {
   await delay()
   const c = find(id)
   if (c.status !== 'IN_PROGRESS' || c.assigneeId !== workerId) {
@@ -224,7 +252,7 @@ export async function releaseComplaint(id, workerId) {
   c.status = 'RECEIVED'
   c.assigneeId = null
   c.assignedAt = null
-  pushHistory(c, 'WORKER', w?.name ?? workerId, 'RELEASE')
+  pushHistory(c, 'WORKER', w?.name ?? workerId, 'RELEASE', note || null)
   persist()
   return decorate(c)
 }
@@ -239,6 +267,7 @@ export async function listMyTasks(workerId, status = 'IN_PROGRESS') {
 }
 
 // POST /complaints/{id}/completion — FR-205
+// 요청 본문은 조치 내용·사진뿐이다. 처리 시간은 접수~완료 간격 하나로만 말한다 (P-G).
 export async function completeComplaint(id, workerId, resolution) {
   await delay()
   const c = find(id)
@@ -253,8 +282,7 @@ export async function completeComplaint(id, workerId, resolution) {
   c.completedAt = nowIso()
   c.resolution = {
     content: resolution.content,
-    photos: resolution.photos ?? [],
-    durationMinutes: Number(resolution.durationMinutes) || 0
+    photos: resolution.photos ?? []
   }
   pushHistory(c, 'WORKER', w?.name ?? workerId, 'COMPLETE')
   persist()
@@ -279,9 +307,11 @@ export async function getDashboard() {
       name: u.name,
       categories: clone(u.categories),
       // '진행/대기' 구분은 두지 않는다 — 상태 모델에 ASSIGNED가 없으므로 보유 건수만 제공한다.
-      holding: inProgress.filter((c) => c.assigneeId === u.id).length
+      holding: inProgress.filter((c) => c.assigneeId === u.id).length,
+      current: currentTasks(u.id)
     }))
-    .sort((a, b) => a.holding - b.holding)
+    // 현황판이므로 지금 일하고 있는 기사가 위로 온다 (AX-11)
+    .sort((a, b) => b.holding - a.holding || a.name.localeCompare(b.name))
   return {
     counts: {
       received: received.length,
@@ -295,14 +325,20 @@ export async function getDashboard() {
 }
 
 // GET /complaints — FR-301
+// 상태·설비·층·긴급도·담당자·기간·지연·검색어 조합. 기간은 접수 시각 기준이다 (P-H).
 export async function listComplaints(filters = {}) {
   await delay()
-  const { status, categoryCode, floor, priority, delayedOnly, keyword } = filters
+  const { status, categoryCode, floor, priority, delayedOnly, keyword, assignee, from, to } = filters
+  const after = from ? new Date(`${from}T00:00:00`).getTime() : null
+  const before = to ? new Date(`${to}T23:59:59`).getTime() : null
   return db.complaints
     .filter((c) => !status || c.status === status)
     .filter((c) => !categoryCode || c.categoryCode === categoryCode)
     .filter((c) => !floor || c.floor === floor)
     .filter((c) => !priority || c.priority === priority)
+    .filter((c) => !assignee || c.assigneeId === assignee)
+    .filter((c) => !after || new Date(c.createdAt).getTime() >= after)
+    .filter((c) => !before || new Date(c.createdAt).getTime() <= before)
     .filter((c) => !delayedOnly || isDelayed(c))
     .filter((c) => !keyword || c.title.includes(keyword) || c.id.includes(keyword.toUpperCase()))
     .map(decorate)
@@ -319,7 +355,8 @@ export async function listWorkers() {
       id: u.id,
       name: u.name,
       categories: clone(u.categories),
-      holding: inProgress.filter((c) => c.assigneeId === u.id).length
+      holding: inProgress.filter((c) => c.assigneeId === u.id).length,
+      current: currentTasks(u.id)
     }))
 }
 
@@ -341,8 +378,9 @@ export async function assignComplaint(id, workerId, adminName) {
   return decorate(c)
 }
 
-// DELETE /complaints/{id}/assignment — FR-306
-export async function revokeAssignment(id, adminName) {
+// DELETE /complaints/{id}/assignment?note= — FR-306
+// note 는 선택 입력이다. 기사가 이동 중일 수 있는 작업을 말없이 빼앗지 않는다 (P-D).
+export async function revokeAssignment(id, adminName, note = null) {
   await delay()
   const c = find(id)
   if (c.status !== 'IN_PROGRESS') {
@@ -351,7 +389,7 @@ export async function revokeAssignment(id, adminName) {
   c.status = 'RECEIVED'
   c.assigneeId = null
   c.assignedAt = null
-  pushHistory(c, 'ADMIN', adminName, 'REVOKE')
+  pushHistory(c, 'ADMIN', adminName, 'REVOKE', note || null)
   persist()
   return decorate(c)
 }
@@ -370,7 +408,8 @@ export async function updateClassification(id, patch, adminName) {
     }
   })
   if (changed.length === 0) return decorate(c)
-  pushHistory(c, 'ADMIN', adminName, 'UPDATE_CLASSIFICATION', changed.join(', '))
+  pushHistory(c, 'ADMIN', adminName, 'UPDATE_CLASSIFICATION',
+    changed.map((f) => CLASSIFICATION_FIELDS[f] ?? f).join(', '))
   persist()
   return decorate(c)
 }
@@ -438,6 +477,7 @@ export async function getStats({ from = null, to = null } = {}) {
   return {
     total: target.length,
     completed: completed.length,
+    rejected: rejected.length,
     avgMinutes,
     rejectRate: target.length ? Math.round((rejected.length / target.length) * 1000) / 10 : 0,
     byCategory: byKey((c) => c.categoryCode),

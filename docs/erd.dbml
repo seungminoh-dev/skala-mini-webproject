@@ -118,7 +118,7 @@ Table worker_category {
 
 Table complaint {
   id            varchar(20)        [pk, note: 'M-YYMMDD-XXXXXX. 순차 증가값이 아닌 비순차 식별자']
-  floor_no      int                [not null, note: '1~8']
+  floor_no      int                [not null, note: '-2~8, 음수는 지하층 (0 미사용)']
   space         space_type         [not null]
   category_code varchar(20)        [not null, ref: > category.code]
   priority      complaint_priority [not null]
@@ -129,7 +129,7 @@ Table complaint {
   assignee_id   varchar(20)        [null, ref: > user_account.id, note: 'RECEIVED 상태에서는 NULL']
 
   resolution_content  text [null, note: '조치 내용. COMPLETED 일 때만 존재']
-  resolution_minutes  int  [null, note: '소요 시간(분)']
+  // 처리 시간은 저장하지 않는다 — completed_at - created_at 으로 산출한다 (P-G)
 
   rejection_type        rejection_type [null]
   rejection_reason      text           [null]
